@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soline the Runner</title>
+  <style>
+    :root {
+      --ink: #eef0ff;
+      --muted: rgba(238, 240, 255, .72);
+
+      --glass: rgba(255, 255, 255, .08);
+      --line: rgba(255, 255, 255, .14);
+
+      --accent: #a855f7;
+      --accent2: #22d3ee;
+      --accent3: #f472b6;
+
+      --shadow: 0 26px 80px rgba(0, 0, 0, .52);
+      --shadow2: 0 14px 30px rgba(0, 0, 0, .44);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--ink);
+      background:
+        radial-gradient(1100px 700px at 18% 16%, rgba(168, 85, 247, .16), transparent 58%),
+        radial-gradient(1100px 700px at 78% 20%, rgba(34, 211, 238, .12), transparent 58%),
+        radial-gradient(1200px 900px at 50% 80%, rgba(244, 114, 182, .08), transparent 62%),
+        linear-gradient(180deg, #05030e, #07051a 50%, #04020b);
+      overflow: hidden;
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .shell {
+      width: min(1040px, 96vw);
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto
+      }
+
+      .shell {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .panel {
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .06));
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 3.2vw, 38px);
+      letter-spacing: .2px;
+    }
+
+    p {
+      margin: 10px 0 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      align-items: center;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, .10);
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 860;
+      box-shadow: var(--shadow2);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 860;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .10);
+      color: var(--ink);
+      border: 1px solid rgba(255, 255, 255, .14);
+      box-shadow: var(--shadow2);
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    .btn:hover {
+      filter: brightness(1.06);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #071021;
+      border: 0;
+      box-shadow: 0 18px 44px rgba(168, 85, 247, .18), 0 18px 44px rgba(34, 211, 238, .10);
+    }
+
+    .game {
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .14);
+      overflow: hidden;
+      position: relative;
+      min-height: 660px;
+      background:
+        radial-gradient(1100px 700px at 30% 0%, rgba(168, 85, 247, .12), transparent 60%),
+        radial-gradient(1100px 700px at 85% 10%, rgba(34, 211, 238, .10), transparent 60%),
+        radial-gradient(900px 700px at 50% 85%, rgba(244, 114, 182, .06), transparent 62%),
+        linear-gradient(180deg, #04020d, #080624 45%, #03010b);
+    }
+
+    .hud {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .hud .pill {
+      pointer-events: none;
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: manipulation;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 10;
+      background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, .32), rgba(0, 0, 0, .62));
+      backdrop-filter: blur(2px);
+    }
+
+    .card {
+      width: min(600px, 96vw);
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .07));
+      box-shadow: 0 30px 110px rgba(0, 0, 0, .55);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: .2px;
+    }
+
+    .card .msg {
+      margin: 10px 0 0 0;
+      color: rgba(238, 240, 255, .80);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 650;
+    }
+
+    .floaties {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: .95;
+    }
+
+    .f {
+      position: absolute;
+      font-size: 18px;
+      opacity: 0;
+      animation: floatUp 3.8s linear infinite;
+      filter: drop-shadow(0 0 14px rgba(244, 114, 182, .18));
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(40px) scale(.9);
+        opacity: 0;
+      }
+
+      12% {
+        opacity: .95;
+      }
+
+      100% {
+        transform: translateY(-260px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .srOnly {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="shell">
+      <section class="panel">
+        <h1>Soline the Runner</h1>
+        <p>
+          Press <b>Space</b> to jump. Difficulty increases every <b>30 seconds</b>.
+          Press <b>R</b> to restart anytime.
+        </p>
+
+        <div class="row">
+          <div class="pill" id="timePill">Time: 0.0s</div>
+          <div class="pill" id="levelPill">Level: 1</div>
+          <div class="pill" id="bestPill">Best: 0.0s</div>
+          <button class="btn primary" id="startBtn" type="button">Start</button>
+          <button class="btn" id="restartBtn" type="button">Restart</button>
+        </div>
+
+        <p style="margin-top:14px">
+          Tip: A quick tap jump is safer for spikes. Hold Space for a slightly higher jump.
+        </p>
+      </section>
+
+      <section class="game">
+        <div class="hud">
+          <div class="pill" id="statusPill">Survive and vibe 🇫🇷</div>
+        </div>
+        <canvas id="c"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="card">
+            <div class="floaties" id="floaties"></div>
+            <h2 id="overlayTitle">Soline the Runner</h2>
+            <p class="msg" id="overlayText">
+              A tiny run through a dreamy France. Press Start, then Space to jump.
+            </p>
+            <div class="row" style="margin-top:14px">
+              <button class="btn primary" id="overlayStart" type="button">Start</button>
+              <button class="btn" id="overlayHow" type="button">How to play</button>
+            </div>
+            <span class="srOnly" id="a11y"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+
+      const timePill = document.getElementById("timePill");
+      const levelPill = document.getElementById("levelPill");
+      const bestPill = document.getElementById("bestPill");
+      const statusPill = document.getElementById("statusPill");
+
+      const startBtn = document.getElementById("startBtn");
+      const restartBtn = document.getElementById("restartBtn");
+      const overlay = document.getElementById("overlay");
+      const overlayTitle = document.getElementById("overlayTitle");
+      const overlayText = document.getElementById("overlayText");
+      const overlayStart = document.getElementById("overlayStart");
+      const overlayHow = document.getElementById("overlayHow");
+      const floaties = document.getElementById("floaties");
+      const a11y = document.getElementById("a11y");
+
+      const MILESTONE_SECONDS = 30.0;
+
+      let dpr = 1, W = 0, H = 0;
+      let raf = 0;
+
+      let running = false;
+      let paused = false;
+      let dead = false;
+
+      let elapsed = 0;
+      let best = Number(localStorage.getItem("solineRunnerBest") || "0");
+
+      // Milestone handling (show once at 30s)
+      let milestoneShown = false;
+
+      // Input
+      let jumpHeld = false;
+      let jumpQueued = false;
+
+      // World
+      const groundYFrac = 0.78;
+      let baseSpeed = 340;   // px/s baseline
+      let speed = 340;
+      let spawnTimer = 0;
+      let nextSpawn = 1.2;
+
+      // Background scroll offsets
+      let bgFarX = 0;
+      let bgMidX = 0;
+      let bgNearX = 0;
+
+      // Runner (girl)
+      const girl = { x: 0, y: 0, w: 34, h: 54, vy: 0, onGround: true, anim: 0 };
+
+      const obstacles = [];
+      const particles = [];
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function rand(min, max) { return Math.random() * (max - min) + min; }
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        W = Math.floor(rect.width * dpr);
+        H = Math.floor(rect.height * dpr);
+        canvas.width = W;
+        canvas.height = H;
+
+        girl.x = 120 * dpr;
+        girl.w = 34 * dpr;
+        girl.h = 54 * dpr;
+
+        resetRunnerPosition();
+      }
+
+      function groundY() { return Math.floor(H * groundYFrac); }
+
+      function resetRunnerPosition() {
+        girl.vy = 0;
+        girl.onGround = true;
+        girl.anim = 0;
+        girl.y = groundY() - girl.h;
+      }
+
+      function difficultyLevel() {
+        // Level 1 for [0,30), Level 2 for [30,60), etc.
+        return Math.floor(elapsed / 30) + 1;
+      }
+
+      function difficultyParams() {
+        const lvl = difficultyLevel();
+        const speedMul = 1 + (lvl - 1) * 0.12;
+        const spawnMul = 1 - (lvl - 1) * 0.06;
+        const minSpawn = Math.max(0.55, 0.95 * spawnMul);
+        const maxSpawn = Math.max(0.85, 1.55 * spawnMul);
+        return { lvl, speedMul, minSpawn, maxSpawn };
+      }
+
+      function updateHUD() {
+        timePill.textContent = `Time: ${elapsed.toFixed(1)}s`;
+        levelPill.textContent = `Level: ${difficultyLevel()}`;
+        bestPill.textContent = `Best: ${best.toFixed(1)}s`;
+      }
+
+      function showOverlay(title, text, primaryLabel = "Start", showPrimary = true) {
+        overlayTitle.textContent = title;
+        overlayText.textContent = text;
+        overlay.style.display = "flex";
+        overlayStart.textContent = primaryLabel;
+        overlayStart.style.display = showPrimary ? "inline-flex" : "none";
+        overlayHow.style.display = "inline-flex";
+      }
+      function hideOverlay() { overlay.style.display = "none"; }
+
+      function floatiesBurst() {
+        floaties.innerHTML = "";
+        const n = 18;
+        for (let i = 0; i < n; i++) {
+          const el = document.createElement("div");
+          el.className = "f";
+          el.textContent = pick(["✨", "💗", "💖", "💘", "✦", "✧", "💕"]);
+          el.style.left = rand(0, 100) + "%";
+          el.style.bottom = "-20px";
+          el.style.animationDelay = rand(0, 2.2) + "s";
+          el.style.fontSize = Math.floor(rand(16, 26)) + "px";
+          floaties.appendChild(el);
+        }
+      }
+
+      function resetState() {
+        running = false;
+        paused = false;
+        dead = false;
+        elapsed = 0;
+
+        milestoneShown = false;
+
+        const dp = difficultyParams();
+        baseSpeed = 340 * dpr;
+        speed = baseSpeed * dp.speedMul;
+
+        spawnTimer = 0;
+        nextSpawn = rand(dp.minSpawn, dp.maxSpawn);
+
+        obstacles.length = 0;
+        particles.length = 0;
+
+        bgFarX = 0;
+        bgMidX = 0;
+        bgNearX = 0;
+
+        resetRunnerPosition();
+        updateHUD();
+        statusPill.textContent = "Survive and vibe 🇫🇷";
+      }
+
+      function aabb(ax, ay, aw, ah, bx, by, bw, bh) {
+        return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+      }
+
+      function spawnObstacle() {
+        const { lvl } = difficultyParams();
+        const gY = groundY();
+
+        // After level 2, allow more complex patterns
+        const r = Math.random();
+        const allowFlying = lvl >= 3;
+        const allowDouble = lvl >= 2;
+
+        // obstacle types: rock, spike, tallSpike, flyer
+        let type = "spike";
+        if (r < 0.28) type = "rock";
+        else if (r < 0.78) type = "spike";
+        else type = "tallSpike";
+        if (allowFlying && Math.random() < 0.18) type = "flyer";
+
+        const spawnOne = (t, xOffset = 0) => {
+          if (t === "flyer") {
+            const w = rand(28, 40) * dpr;
+            const h = rand(18, 26) * dpr;
+            const y = gY - girl.h - rand(70, 120) * dpr;
+            obstacles.push({ x: W + (30 * dpr) + xOffset, y, w, h, type: t });
+            return;
+          }
+          if (t === "rock") {
+            const h = rand(28, 44) * dpr;
+            const w = rand(28, 48) * dpr;
+            obstacles.push({ x: W + (30 * dpr) + xOffset, y: gY - h, w, h, type: t });
+            return;
+          }
+          if (t === "tallSpike") {
+            const h = rand(54, 74) * dpr;
+            const w = rand(24, 34) * dpr;
+            obstacles.push({ x: W + (30 * dpr) + xOffset, y: gY - h, w, h, type: t });
+            return;
+          }
+          // spike default
+          const h = rand(34, 54) * dpr;
+          const w = rand(22, 34) * dpr;
+          obstacles.push({ x: W + (30 * dpr) + xOffset, y: gY - h, w, h, type: t });
+        };
+
+        spawnOne(type, 0);
+
+        // double obstacle sometimes
+        if (allowDouble && type !== "flyer" && Math.random() < 0.20) {
+          const gap = rand(46, 80) * dpr;
+          const t2 = Math.random() < 0.6 ? "spike" : "rock";
+          spawnOne(t2, gap);
+        }
+      }
+
+      function tryJump() {
+        if (!running || paused || dead) return;
+        if (girl.onGround) {
+          girl.vy = (-640 - (jumpHeld ? 80 : 0)) * dpr;
+          girl.onGround = false;
+        }
+      }
+
+      function endGame() {
+        running = false;
+        paused = false;
+        dead = true;
+
+        if (elapsed > best) {
+          best = elapsed;
+          localStorage.setItem("solineRunnerBest", String(best));
+        }
+        updateHUD();
+
+        showOverlay(
+          "Ouch",
+          "You hit an obstacle. Press R or Restart and try again.",
+          "Restart",
+          true
+        );
+        a11y.textContent = "Lost.";
+      }
+
+      function showMilestone() {
+        paused = true;
+        running = false;
+        floatiesBurst();
+        showOverlay(
+          "Happy 5th day 💫",
+          "Happy 5th day of the love month, Soline.",
+          "Continue",
+          true
+        );
+        statusPill.textContent = "Milestone unlocked 💘";
+        a11y.textContent = "Milestone shown.";
+      }
+
+      // Vector-ish French motif drawing (silhouette / line art)
+      function drawEiffel(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.40)";
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+
+        // tower outline
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-16, -70);
+        ctx.lineTo(-6, -92);
+        ctx.lineTo(-10, -116);
+        ctx.lineTo(0, -140);
+        ctx.lineTo(10, -116);
+        ctx.lineTo(6, -92);
+        ctx.lineTo(16, -70);
+        ctx.closePath();
+        ctx.stroke();
+
+        // cross braces
+        const braces = [-30, -52, -74, -96, -118];
+        braces.forEach((yy, i) => {
+          ctx.beginPath();
+          ctx.moveTo(-14 + i * 0.2, yy);
+          ctx.lineTo(14 - i * 0.2, yy);
+          ctx.stroke();
+        });
+
+        // legs
+        ctx.beginPath();
+        ctx.moveTo(-16, -70); ctx.lineTo(-30, 0);
+        ctx.moveTo(16, -70); ctx.lineTo(30, 0);
+        ctx.stroke();
+
+        // base arch
+        ctx.beginPath();
+        ctx.moveTo(-22, -10);
+        ctx.quadraticCurveTo(0, -28, 22, -10);
+        ctx.stroke();
+
+        // top antenna
+        ctx.beginPath();
+        ctx.moveTo(0, -140);
+        ctx.lineTo(0, -156);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawLouvrePyramid(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.38)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-40, 0);
+        ctx.lineTo(0, -44);
+        ctx.lineTo(40, 0);
+        ctx.closePath();
+        ctx.stroke();
+        // grid
+        for (let i = 1; i <= 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-40 + i * 16, 0);
+          ctx.lineTo(0, -44);
+          ctx.stroke();
+        }
+        for (let i = 1; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-40, 0 - i * 12);
+          ctx.lineTo(40, 0 - i * 12);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawCastle(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.34)";
+        ctx.lineWidth = 2;
+
+        // base wall
+        ctx.beginPath();
+        ctx.moveTo(-60, 0);
+        ctx.lineTo(-60, -30);
+        ctx.lineTo(-40, -30);
+        ctx.lineTo(-40, -52);
+        ctx.lineTo(-20, -52);
+        ctx.lineTo(-20, -30);
+        ctx.lineTo(0, -30);
+        ctx.lineTo(0, -62);
+        ctx.lineTo(18, -62);
+        ctx.lineTo(18, -30);
+        ctx.lineTo(38, -30);
+        ctx.lineTo(38, -50);
+        ctx.lineTo(56, -50);
+        ctx.lineTo(56, -30);
+        ctx.lineTo(60, -30);
+        ctx.lineTo(60, 0);
+        ctx.closePath();
+        ctx.stroke();
+
+        // flags
+        ctx.beginPath();
+        ctx.moveTo(-10, -62); ctx.lineTo(-10, -78);
+        ctx.lineTo(6, -74); ctx.lineTo(-10, -70);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawBakery(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.36)";
+        ctx.lineWidth = 2;
+
+        // shop box
+        ctx.beginPath();
+        ctx.roundRect(-42, -32, 84, 32, 6);
+        ctx.stroke();
+
+        // awning stripes
+        for (let i = 0; i < 6; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-42 + i * 14, -32);
+          ctx.lineTo(-42 + i * 14, -12);
+          ctx.stroke();
+        }
+
+        // sign "Boulangerie"
+        ctx.beginPath();
+        ctx.roundRect(-46, -54, 92, 18, 8);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(255,255,255,.22)";
+        ctx.font = "10px ui-sans-serif";
+        ctx.fillText("BOULANGERIE", -38, -41);
+
+        ctx.restore();
+      }
+
+      function drawBicycle(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.34)";
+        ctx.lineWidth = 2;
+
+        // wheels
+        ctx.beginPath(); ctx.arc(-26, 0, 14, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(26, 0, 14, 0, Math.PI * 2); ctx.stroke();
+
+        // frame
+        ctx.beginPath();
+        ctx.moveTo(-26, 0);
+        ctx.lineTo(0, -14);
+        ctx.lineTo(26, 0);
+        ctx.lineTo(0, 0);
+        ctx.closePath();
+        ctx.stroke();
+
+        // handlebar + seat
+        ctx.beginPath();
+        ctx.moveTo(0, -14);
+        ctx.lineTo(10, -22);
+        ctx.moveTo(10, -22);
+        ctx.lineTo(22, -22);
+        ctx.moveTo(-6, -16);
+        ctx.lineTo(-14, -22);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawCoffee(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.34)";
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.roundRect(-26, -18, 44, 26, 6);
+        ctx.stroke();
+        // handle
+        ctx.beginPath();
+        ctx.arc(22, -6, 8, -Math.PI / 2, Math.PI / 2);
+        ctx.stroke();
+        // steam
+        for (let i = 0; i < 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-14 + i * 10, -22);
+          ctx.quadraticCurveTo(-10 + i * 10, -32, -14 + i * 10, -40);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawWine(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.34)";
+        ctx.lineWidth = 2;
+
+        // glass bowl
+        ctx.beginPath();
+        ctx.moveTo(-14, -30);
+        ctx.quadraticCurveTo(0, -10, 14, -30);
+        ctx.closePath();
+        ctx.stroke();
+        // stem
+        ctx.beginPath();
+        ctx.moveTo(0, -10);
+        ctx.lineTo(0, 10);
+        ctx.stroke();
+        // base
+        ctx.beginPath();
+        ctx.moveTo(-16, 14);
+        ctx.lineTo(16, 14);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawCheese(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.34)";
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.moveTo(-30, 0);
+        ctx.lineTo(30, 0);
+        ctx.lineTo(10, -26);
+        ctx.lineTo(-30, -26);
+        ctx.closePath();
+        ctx.stroke();
+
+        // holes
+        const holes = [[-10, -12], [0, -16], [10, -10]];
+        holes.forEach(([hx, hy]) => {
+          ctx.beginPath(); ctx.arc(hx, hy, 3, 0, Math.PI * 2); ctx.stroke();
+        });
+
+        ctx.restore();
+      }
+
+      function drawFarm(x, y, s, alpha) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(x, y);
+        ctx.scale(s, s);
+        ctx.strokeStyle = "rgba(255,255,255,.30)";
+        ctx.lineWidth = 2;
+
+        // barn
+        ctx.beginPath();
+        ctx.moveTo(-34, 0);
+        ctx.lineTo(-34, -24);
+        ctx.lineTo(0, -46);
+        ctx.lineTo(34, -24);
+        ctx.lineTo(34, 0);
+        ctx.closePath();
+        ctx.stroke();
+
+        // door
+        ctx.beginPath();
+        ctx.roundRect(-10, -18, 20, 18, 4);
+        ctx.stroke();
+
+        // tiny cow dot
+        ctx.beginPath();
+        ctx.arc(48, -6, 4, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      function drawBackground(dt) {
+        const gY = groundY();
+
+        // parallax scroll based on speed
+        bgFarX += (speed * 0.18) * dt;
+        bgMidX += (speed * 0.40) * dt;
+        bgNearX += (speed * 0.72) * dt;
+
+        const farY = gY - 230 * dpr;
+        const midY = gY - 160 * dpr;
+        const nearY = gY - 95 * dpr;
+
+        // stars speckle
+        ctx.save();
+        for (let i = 0; i < 80; i++) {
+          const sx = (i * 97 + (bgFarX * 0.3)) % (W + 200) - 100;
+          const sy = (i * 41) % Math.floor(gY - 220 * dpr) + 20 * dpr;
+          const a = 0.12 + ((i % 7) * 0.01);
+          ctx.fillStyle = `rgba(255,255,255,${a})`;
+          ctx.beginPath();
+          ctx.arc(sx, sy, (0.7 + (i % 3) * 0.3) * dpr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // far skyline (castle + Eiffel) repeat
+        const farStep = 420 * dpr;
+        for (let x = -farStep; x < W + farStep; x += farStep) {
+          const px = x - (bgFarX % farStep);
+          drawCastle(px + 80 * dpr, farY, 1.2 * dpr, 0.22);
+          drawEiffel(px + 260 * dpr, farY + 10 * dpr, 1.05 * dpr, 0.22);
+        }
+
+        // mid layer (Louvre + bakery) repeat
+        const midStep = 380 * dpr;
+        for (let x = -midStep; x < W + midStep; x += midStep) {
+          const px = x - (bgMidX % midStep);
+          drawLouvrePyramid(px + 110 * dpr, midY, 1.25 * dpr, 0.26);
+          drawBakery(px + 270 * dpr, midY + 6 * dpr, 1.15 * dpr, 0.26);
+        }
+
+        // near layer (bicycle + coffee + wine + cheese + farm) repeat
+        const nearStep = 320 * dpr;
+        for (let x = -nearStep; x < W + nearStep; x += nearStep) {
+          const px = x - (bgNearX % nearStep);
+          const k = (Math.floor((x / nearStep)) % 6 + 6) % 6;
+          const alpha = 0.22;
+          if (k === 0) drawBicycle(px + 70 * dpr, nearY + 18 * dpr, 1.2 * dpr, alpha);
+          if (k === 1) drawCoffee(px + 90 * dpr, nearY + 20 * dpr, 1.2 * dpr, alpha);
+          if (k === 2) drawWine(px + 90 * dpr, nearY + 24 * dpr, 1.2 * dpr, alpha);
+          if (k === 3) drawCheese(px + 90 * dpr, nearY + 28 * dpr, 1.2 * dpr, alpha);
+          if (k === 4) drawFarm(px + 90 * dpr, nearY + 30 * dpr, 1.1 * dpr, alpha);
+          if (k === 5) drawBicycle(px + 90 * dpr, nearY + 18 * dpr, 1.2 * dpr, alpha);
+        }
+
+        // ground
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,.06)";
+        ctx.fillRect(0, gY, W, H - gY);
+
+        // horizon line
+        ctx.strokeStyle = "rgba(34,211,238,.16)";
+        ctx.lineWidth = 2 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(0, gY);
+        ctx.lineTo(W, gY);
+        ctx.stroke();
+
+        // ground dust streaks
+        ctx.globalAlpha = 0.28;
+        ctx.strokeStyle = "rgba(168,85,247,.16)";
+        ctx.lineWidth = 3 * dpr;
+        for (let i = 0; i < 9; i++) {
+          const x = (i * 150 + (performance.now() * 0.18)) % (W + 240) - 240;
+          ctx.beginPath();
+          ctx.moveTo(x, gY + 30 * dpr);
+          ctx.lineTo(x + 90 * dpr, gY + 30 * dpr);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawGirl(x, y) {
+        const t = girl.anim;
+
+        const skin = "rgba(255,225,210,.95)";
+        const hair = "rgba(35,26,38,.95)";
+        const dress = "rgba(168,85,247,.85)";
+        const shoe = "rgba(34,211,238,.90)";
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // shadow
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = "rgba(0,0,0,.65)";
+        ctx.beginPath();
+        ctx.ellipse(girl.w * 0.45, girl.h * 0.98, girl.w * 0.42, girl.h * 0.10, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // head
+        ctx.fillStyle = skin;
+        ctx.beginPath();
+        ctx.arc(girl.w * 0.52, girl.h * 0.18, girl.w * 0.18, 0, Math.PI * 2);
+        ctx.fill();
+
+        // hair
+        ctx.fillStyle = hair;
+        ctx.beginPath();
+        ctx.arc(girl.w * 0.50, girl.h * 0.17, girl.w * 0.20, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(girl.w * 0.42, girl.h * 0.22, girl.w * 0.12, girl.h * 0.18, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // dress
+        ctx.fillStyle = dress;
+        ctx.beginPath();
+        ctx.roundRect(girl.w * 0.40, girl.h * 0.32, girl.w * 0.28, girl.h * 0.32, girl.w * 0.08);
+        ctx.fill();
+
+        // arm
+        ctx.strokeStyle = skin;
+        ctx.lineWidth = 4 * dpr;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(girl.w * 0.43, girl.h * 0.42);
+        ctx.lineTo(girl.w * 0.34, girl.h * 0.50);
+        ctx.stroke();
+
+        // legs
+        const phase = Math.sin(t);
+        const legA = phase * 0.20;
+        const legB = -phase * 0.20;
+
+        function leg(px, ang) {
+          ctx.save();
+          ctx.translate(px, girl.h * 0.64);
+          ctx.rotate(ang);
+
+          ctx.strokeStyle = "rgba(255,225,210,.9)";
+          ctx.lineWidth = 5 * dpr;
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, girl.h * 0.22);
+          ctx.stroke();
+
+          ctx.strokeStyle = shoe;
+          ctx.lineWidth = 6 * dpr;
+          ctx.beginPath();
+          ctx.moveTo(0, girl.h * 0.22);
+          ctx.lineTo(girl.w * 0.12, girl.h * 0.22);
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        leg(girl.w * 0.46, legA);
+        leg(girl.w * 0.60, legB);
+
+        // face dot
+        ctx.fillStyle = "rgba(20,20,30,.7)";
+        ctx.beginPath();
+        ctx.arc(girl.w * 0.58, girl.h * 0.18, 1.6 * dpr, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function drawObstacle(o) {
+        ctx.save();
+
+        if (o.type === "rock") {
+          ctx.fillStyle = "rgba(255,255,255,.12)";
+          ctx.strokeStyle = "rgba(255,255,255,.20)";
+          ctx.lineWidth = 2 * dpr;
+          ctx.beginPath();
+          ctx.roundRect(o.x, o.y, o.w, o.h, 8 * dpr);
+          ctx.fill();
+          ctx.stroke();
+        } else if (o.type === "flyer") {
+          // little drone/bird-like
+          ctx.strokeStyle = "rgba(34,211,238,.40)";
+          ctx.lineWidth = 2 * dpr;
+          ctx.beginPath();
+          ctx.roundRect(o.x, o.y, o.w, o.h, 10 * dpr);
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(o.x + o.w * 0.2, o.y + o.h * 0.5);
+          ctx.lineTo(o.x + o.w * 0.8, o.y + o.h * 0.5);
+          ctx.stroke();
+
+          ctx.fillStyle = "rgba(244,114,182,.18)";
+          ctx.beginPath();
+          ctx.arc(o.x + o.w * 0.35, o.y + o.h * 0.5, 2.2 * dpr, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(o.x + o.w * 0.65, o.y + o.h * 0.5, 2.2 * dpr, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // spikes
+          const tall = (o.type === "tallSpike");
+          ctx.fillStyle = tall ? "rgba(244,114,182,.20)" : "rgba(244,114,182,.16)";
+          ctx.strokeStyle = tall ? "rgba(244,114,182,.32)" : "rgba(244,114,182,.26)";
+          ctx.lineWidth = 2 * dpr;
+
+          ctx.beginPath();
+          ctx.moveTo(o.x, o.y + o.h);
+          ctx.lineTo(o.x + o.w * 0.5, o.y);
+          ctx.lineTo(o.x + o.w, o.y + o.h);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawScene(dt) {
+        ctx.clearRect(0, 0, W, H);
+
+        drawBackground(dt);
+
+        // obstacles
+        for (const o of obstacles) drawObstacle(o);
+
+        // runner
+        drawGirl(girl.x, girl.y);
+      }
+
+      function step(dt) {
+        if (!running || paused || dead) return;
+
+        elapsed += dt;
+
+        const dp = difficultyParams();
+        speed = (baseSpeed * dp.speedMul);
+
+        // show milestone exactly once at 30 seconds
+        if (!milestoneShown && elapsed >= MILESTONE_SECONDS) {
+          milestoneShown = true;
+          showMilestone();
+          return;
+        }
+
+        // spawn logic
+        spawnTimer += dt;
+        if (spawnTimer >= nextSpawn) {
+          spawnTimer = 0;
+          nextSpawn = rand(dp.minSpawn, dp.maxSpawn);
+          spawnObstacle();
+        }
+
+        // physics
+        const gY = groundY();
+        const GRAV = 1900 * dpr;
+
+        if (jumpQueued) {
+          tryJump();
+          jumpQueued = false;
+        }
+
+        if (!girl.onGround && jumpHeld && girl.vy < 0) {
+          girl.vy -= 260 * dpr * dt;
+        }
+
+        girl.vy += GRAV * dt;
+        girl.y += girl.vy * dt;
+
+        if (girl.y >= gY - girl.h) {
+          girl.y = gY - girl.h;
+          girl.vy = 0;
+          girl.onGround = true;
+        } else {
+          girl.onGround = false;
+        }
+
+        // animation
+        girl.anim += dt * (girl.onGround ? (12 + dp.lvl * 0.4) : 6);
+
+        // move obstacles
+        for (const o of obstacles) {
+          o.x -= speed * dt;
+
+          // flyer wiggle
+          if (o.type === "flyer") {
+            o.y += Math.sin((performance.now() / 1000) * 3.5 + o.x * 0.01) * 0.18 * dpr;
+          }
+        }
+
+        while (obstacles.length && obstacles[0].x + obstacles[0].w < -80 * dpr) {
+          obstacles.shift();
+        }
+
+        // collision (slightly fair hitbox)
+        const hx = girl.x + 8 * dpr;
+        const hy = girl.y + 6 * dpr;
+        const hw = girl.w - 16 * dpr;
+        const hh = girl.h - 10 * dpr;
+
+        for (const o of obstacles) {
+          if (aabb(hx, hy, hw, hh, o.x, o.y, o.w, o.h)) {
+            endGame();
+            return;
+          }
+        }
+
+        updateHUD();
+        statusPill.textContent = `Level ${dp.lvl}  •  Speed ${(speed / dpr).toFixed(0)}`;
+      }
+
+      function loop() {
+        cancelAnimationFrame(raf);
+        let last = performance.now();
+
+        const tick = (now) => {
+          const dt = Math.min(0.033, (now - last) / 1000);
+          last = now;
+
+          step(dt);
+          drawScene(dt);
+
+          raf = requestAnimationFrame(tick);
+        };
+
+        raf = requestAnimationFrame(tick);
+      }
+
+      function startGame() {
+        resetState();
+        running = true;
+        paused = false;
+        dead = false;
+        hideOverlay();
+        loop();
+      }
+
+      function restartGame() {
+        startGame();
+      }
+
+      function resumeGame() {
+        // called after milestone overlay "Continue"
+        hideOverlay();
+        running = true;
+        paused = false;
+        dead = false;
+        loop();
+      }
+
+      // Input
+      function onKeyDown(e) {
+        if (e.code === "Space") {
+          e.preventDefault();
+          jumpHeld = true;
+          jumpQueued = true;
+        }
+        if (e.key === "r" || e.key === "R") {
+          e.preventDefault();
+          restartGame();
+        }
+      }
+      function onKeyUp(e) {
+        if (e.code === "Space") {
+          e.preventDefault();
+          jumpHeld = false;
+        }
+      }
+
+      // Touch: tap jump
+      canvas.addEventListener("touchstart", () => {
+        jumpHeld = true;
+        jumpQueued = true;
+        setTimeout(() => { jumpHeld = false; }, 120);
+      }, { passive: true });
+
+      // UI events
+      startBtn.addEventListener("click", startGame);
+      restartBtn.addEventListener("click", restartGame);
+
+      overlayStart.addEventListener("click", () => {
+        // start button acts as Start at intro, Continue at milestone, Restart after crash
+        const label = overlayStart.textContent.trim().toLowerCase();
+        if (label.includes("continue")) {
+          resumeGame();
+          return;
+        }
+        if (label.includes("restart")) {
+          restartGame();
+          return;
+        }
+        startGame();
+      });
+
+      overlayHow.addEventListener("click", () => {
+        overlayTitle.textContent = "How to play";
+        overlayText.textContent =
+          "Press Space to jump. Difficulty increases every 30 seconds. At 30 seconds you get a sweet message and can continue.";
+      });
+
+      window.addEventListener("keydown", onKeyDown);
+      window.addEventListener("keyup", onKeyUp);
+      window.addEventListener("resize", () => { resize(); });
+
+      // init
+      bestPill.textContent = `Best: ${best.toFixed(1)}s`;
+      resize();
+      resetState();
+      showOverlay("Soline the Runner", "A tiny run through a dreamy France. Press Start, then Space to jump.", "Start", true);
+      drawScene(0);
+    })();
+  </script>
+</body>
+
+</html>
