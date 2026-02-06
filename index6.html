@@ -1,0 +1,1497 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Louvre Laser Heist</title>
+  <style>
+    :root {
+      --ink: #eef0ff;
+      --muted: rgba(238, 240, 255, .72);
+      --glass: rgba(255, 255, 255, .08);
+      --line: rgba(255, 255, 255, .14);
+      --accent: #a855f7;
+      --accent2: #22d3ee;
+      --accent3: #f472b6;
+      --shadow: 0 26px 80px rgba(0, 0, 0, .52);
+      --shadow2: 0 14px 30px rgba(0, 0, 0, .44);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  color: var(--ink);
+  overflow: hidden;
+  position: relative;
+
+  /* Elegant Louvre dusk palette */
+  background:
+    radial-gradient(1200px 600px at 50% 120%, rgba(34,211,238,.08), transparent 60%),
+    linear-gradient(180deg, #0b1020 0%, #0d1328 40%, #0a0f1f 100%);
+}
+
+/* remove old cosmic layers */
+body::before,
+body::after {
+  display: none;
+}
+
+.louvre-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.louvre-bg svg {
+  width: 100%;
+  height: 100%;
+}
+
+
+
+    @keyframes rotateBg {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes driftStars {
+      0% {
+        transform: translateY(0);
+      }
+
+      100% {
+        transform: translateY(-550px);
+      }
+    }
+
+    .bg-pulse {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.25), transparent 60%);
+      /* stronger pulse */
+      animation: breathe 5s ease-in-out infinite;
+      /* faster breath */
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        opacity: 0.6;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1.0;
+        transform: scale(1.15);
+      }
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .shell {
+      width: min(1040px, 96vw);
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto
+      }
+
+      .shell {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .panel {
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .06));
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 3.0vw, 36px);
+      letter-spacing: .2px;
+    }
+
+    p {
+      margin: 10px 0 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+      align-items: center;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, .10);
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 860;
+      box-shadow: var(--shadow2);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 860;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .10);
+      color: var(--ink);
+      border: 1px solid rgba(255, 255, 255, .14);
+      box-shadow: var(--shadow2);
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    .btn:hover {
+      filter: brightness(1.06);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #071021;
+      border: 0;
+      box-shadow: 0 18px 44px rgba(168, 85, 247, .18), 0 18px 44px rgba(34, 211, 238, .10);
+    }
+
+    .board {
+      border-radius: 26px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, .14);
+      overflow: hidden;
+      position: relative;
+      min-height: 660px;
+      background:
+        radial-gradient(1000px 700px at 30% 0%, rgba(168, 85, 247, .10), transparent 60%),
+        radial-gradient(1000px 700px at 85% 10%, rgba(34, 211, 238, .08), transparent 60%),
+        radial-gradient(900px 700px at 50% 85%, rgba(244, 114, 182, .06), transparent 62%),
+        linear-gradient(180deg, #04020d, #080624 45%, #03010b);
+    }
+
+    canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 10;
+      background: radial-gradient(circle at 50% 35%, rgba(0, 0, 0, .28), rgba(0, 0, 0, .64));
+      backdrop-filter: blur(2px);
+    }
+
+    .card {
+      width: min(620px, 96vw);
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .07));
+      box-shadow: 0 30px 110px rgba(0, 0, 0, .55);
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: .2px;
+    }
+
+    .card .msg {
+      margin: 10px 0 0 0;
+      color: rgba(238, 240, 255, .80);
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 650;
+    }
+
+    .floaties {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: .95;
+    }
+
+    .f {
+      position: absolute;
+      font-size: 18px;
+      opacity: 0;
+      animation: floatUp 3.8s linear infinite;
+      filter: drop-shadow(0 0 14px rgba(244, 114, 182, .18));
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(40px) scale(.9);
+        opacity: 0;
+      }
+
+      12% {
+        opacity: .95;
+      }
+
+      100% {
+        transform: translateY(-260px) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    .srOnly {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="louvre-bg">
+    <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+      <!-- sky glow -->
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#111833"/>
+          <stop offset="100%" stop-color="#0a0f1f"/>
+        </linearGradient>
+      </defs>
+  
+      <rect width="1200" height="700" fill="url(#sky)" />
+  
+      <!-- palace facade line art -->
+      <g stroke="rgba(255,255,255,0.06)" stroke-width="2" fill="none">
+        <rect x="50" y="260" width="1100" height="180" rx="6"/>
+        <line x1="50" y1="330" x2="1150" y2="330"/>
+        <line x1="50" y1="380" x2="1150" y2="380"/>
+      </g>
+  
+      <!-- Louvre Pyramid -->
+      <g stroke="rgba(34,211,238,0.25)" stroke-width="2" fill="rgba(34,211,238,0.04)">
+        <polygon points="600,200 780,500 420,500"/>
+        <!-- grid -->
+        <line x1="600" y1="200" x2="600" y2="500"/>
+        <line x1="510" y1="350" x2="690" y2="350"/>
+        <line x1="450" y1="420" x2="750" y2="420"/>
+        <line x1="480" y1="280" x2="720" y2="500"/>
+        <line x1="720" y1="280" x2="480" y2="500"/>
+      </g>
+  
+      <!-- reflection -->
+      <ellipse cx="600" cy="560" rx="280" ry="40" fill="rgba(34,211,238,0.06)" />
+    </svg>
+  </div>
+  
+<div class="bg-pulse"></div>
+  <div class="wrap">
+    <div class="shell">
+      <section class="panel">
+        <h1>Louvre Laser Heist</h1>
+        <p>
+          Move with <b>arrow keys</b> or <b>WASD</b>. Avoid lasers, grab the heart, reach the exit.
+        </p>
+        <div class="row">
+          <div class="pill" id="levelPill">Level: 1</div>
+          <div class="pill" id="statusPill">Status: Sneaking</div>
+          <button class="btn primary" id="startBtn" type="button">Start</button>
+          <button class="btn" id="resetBtn" type="button">Reset</button>
+        </div>
+        <div class="row" id="powerHud" style="opacity:0; transition:opacity .3s">
+          <div class="pill" id="shieldPill" style="display:none; color:#22d3ee; border-color:#22d3ee">🛡️ Shield Active
+          </div>
+          <div class="pill" id="timePill" style="display:none; color:#fbbf24; border-color:#fbbf24">⏳ Time Freeze</div>
+        </div>
+        <p style="margin-top:14px">
+          Tip: You can “micro tap” for tight gaps. Touch support: drag your finger on the board.
+        </p>
+      </section>
+
+      <section class="board">
+        <canvas id="c"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="card">
+            <div class="floaties" id="floaties"></div>
+            <h2 id="overlayTitle">Mission briefing</h2>
+            <p class="msg" id="overlayText">
+              Steal the heart artifact from the Louvre. Do not touch the lasers.
+            </p>
+            <div class="row" style="margin-top:14px">
+              <button class="btn primary" id="overlayPrimary" type="button">Start</button>
+              <button class="btn" id="overlayHow" type="button">How to play</button>
+            </div>
+            <span class="srOnly" id="a11y"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+
+      const levelPill = document.getElementById("levelPill");
+      const statusPill = document.getElementById("statusPill");
+      const startBtn = document.getElementById("startBtn");
+      const resetBtn = document.getElementById("resetBtn");
+
+      const overlay = document.getElementById("overlay");
+      const overlayTitle = document.getElementById("overlayTitle");
+      const overlayText = document.getElementById("overlayText");
+      const overlayPrimary = document.getElementById("overlayPrimary");
+      const overlayHow = document.getElementById("overlayHow");
+      const floaties = document.getElementById("floaties");
+      const a11y = document.getElementById("a11y");
+
+      let dpr = 1, W = 0, H = 0;
+      let raf = 0;
+
+      const world = {
+        level: 1,
+        running: false,
+        hasHeart: false,
+        won: false,
+        dead: false,
+        t: 0,
+        shield: false,
+        timeParams: { active: false, timer: 0 }
+      };
+
+      const keys = { up: false, down: false, left: false, right: false };
+
+      // Touch drag to move
+      let touchActive = false;
+      let touchTarget = { x: 0, y: 0 };
+
+      // Game entities in normalized board coords [0..1]
+      let walls = [];
+      let lasers = [];      // {x1,y1,x2,y2, phase, speed, width}
+      let powerups = [];    // {x, y, r, type: 'SHIELD'|'TIME', collected: false}
+      let heart = { x: 0.78, y: 0.50, r: 0.030 };
+      let exit = { x: 0.92, y: 0.12, w: 0.06, h: 0.08 };
+
+      const girl = {
+        x: 0.10, y: 0.86,
+        r: 0.022,
+        vx: 0, vy: 0
+      };
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function rand(min, max) { return Math.random() * (max - min) + min; }
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      function resize() {
+        const rect = canvas.getBoundingClientRect();
+        dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        W = Math.floor(rect.width * dpr);
+        H = Math.floor(rect.height * dpr);
+        canvas.width = W;
+        canvas.height = H;
+      }
+
+      function showOverlay(title, text, primaryLabel = "Start", showPrimary = true) {
+        overlayTitle.textContent = title;
+        overlayText.textContent = text;
+        overlayPrimary.textContent = primaryLabel;
+        overlayPrimary.style.display = showPrimary ? "inline-flex" : "none";
+        overlay.style.display = "flex";
+      }
+      function hideOverlay() { overlay.style.display = "none"; }
+
+      function floatiesBurst() {
+        floaties.innerHTML = "";
+        const n = 18;
+        for (let i = 0; i < n; i++) {
+          const el = document.createElement("div");
+          el.className = "f";
+          el.textContent = pick(["✨", "💗", "💖", "💘", "✦", "✧", "💕"]);
+          el.style.left = rand(0, 100) + "%";
+          el.style.bottom = "-20px";
+          el.style.animationDelay = rand(0, 2.2) + "s";
+          el.style.fontSize = Math.floor(rand(16, 26)) + "px";
+          floaties.appendChild(el);
+        }
+      }
+
+      function toPxX(nx) { return nx * W; }
+      function toPxY(ny) { return ny * H; }
+
+      function circleRectCollide(cx, cy, cr, rx, ry, rw, rh) {
+        const closestX = clamp(cx, rx, rx + rw);
+        const closestY = clamp(cy, ry, ry + rh);
+        const dx = cx - closestX;
+        const dy = cy - closestY;
+        return (dx * dx + dy * dy) <= cr * cr;
+      }
+
+      function distPointToSegment(px, py, x1, y1, x2, y2) {
+        const vx = x2 - x1, vy = y2 - y1;
+        const wx = px - x1, wy = py - y1;
+        const c1 = vx * wx + vy * wy;
+        if (c1 <= 0) return Math.hypot(px - x1, py - y1);
+        const c2 = vx * vx + vy * vy;
+        if (c2 <= c1) return Math.hypot(px - x2, py - y2);
+        const b = c1 / c2;
+        const bx = x1 + b * vx;
+        const by = y1 + b * vy;
+        return Math.hypot(px - bx, py - by);
+      }
+
+      
+// --- Placement helpers (artifact randomization & reachability) ---
+function pointBlocked(x, y, r = 0.02) {
+  // true if a circle at (x,y) overlaps ANY wall (including border frame)
+  for (const w of walls) {
+    if (circleRectCollide(x, y, r, w.x, w.y, w.w, w.h)) return true;
+  }
+  return false;
+}
+
+function laserDangerCount(x, y, radius = 0.06) {
+  // Count how many laser lanes are "near" this point (using base lanes, not oscillation)
+  let c = 0;
+  for (const L of lasers) {
+    const d = distPointToSegment(x, y, L.x1, L.y1, L.x2, L.y2);
+    if (d < radius) c++;
+  }
+  return c;
+}
+
+function minLaserDist(x, y) {
+  let md = 1e9;
+  for (const L of lasers) {
+    const d = distPointToSegment(x, y, L.x1, L.y1, L.x2, L.y2);
+    if (d < md) md = d;
+  }
+  return md;
+}
+
+function isReachable(start, target, opts = {}) {
+  // BFS on a grid, considering ONLY wall collisions (lasers ignored)
+  const N = opts.N || 64;
+  const r = opts.r || girl.r; // clearance radius
+  const sx = Math.max(0, Math.min(N - 1, Math.floor(start.x * N)));
+  const sy = Math.max(0, Math.min(N - 1, Math.floor(start.y * N)));
+
+  // target can be a point {x,y} or a rect {x,y,w,h}
+  const isTargetCell = (cx, cy) => {
+    const x = (cx + 0.5) / N;
+    const y = (cy + 0.5) / N;
+    if ("w" in target) {
+      return x >= target.x && x <= target.x + target.w && y >= target.y && y <= target.y + target.h;
+    }
+    const dx = x - target.x;
+    const dy = y - target.y;
+    return (dx * dx + dy * dy) <= (Math.max(0.02, target.r || 0.03) ** 2);
+  };
+
+  const key = (cx, cy) => cx + "," + cy;
+  const q = [[sx, sy]];
+  const seen = new Set([key(sx, sy)]);
+
+  const cellFree = (cx, cy) => {
+    const x = (cx + 0.5) / N;
+    const y = (cy + 0.5) / N;
+    // keep away from border a little
+    if (x < 0.03 + r || x > 0.97 - r || y < 0.03 + r || y > 0.97 - r) return false;
+    return !pointBlocked(x, y, r * 1.05);
+  };
+
+  if (!cellFree(sx, sy)) return false;
+
+  while (q.length) {
+    const [cx, cy] = q.shift();
+    if (isTargetCell(cx, cy)) return true;
+
+    const neigh = [
+      [cx + 1, cy], [cx - 1, cy], [cx, cy + 1], [cx, cy - 1],
+      [cx + 1, cy + 1], [cx - 1, cy - 1], [cx + 1, cy - 1], [cx - 1, cy + 1]
+    ];
+
+    for (const [nx, ny] of neigh) {
+      if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+      const k = key(nx, ny);
+      if (seen.has(k)) continue;
+      if (!cellFree(nx, ny)) continue;
+      seen.add(k);
+      q.push([nx, ny]);
+    }
+  }
+  return false;
+}
+
+function placeHeartRandom() {
+        // Randomly place the heart in free space and ensure reachability.
+        // Avoid corners/edges so it truly feels "random anywhere".
+        const tries = 1400;
+        const start = { x: girl.x, y: girl.y };
+
+        const clearance = Math.max(0.030, girl.r * 1.35);
+        const minBorder = 0.09;            // keep away from extreme corners/edges
+        const safeLaserRadius = 0.055;     // "near laser" radius
+        const minLaser = 0.026;            // minimum distance to any laser lane
+        const maxNearLasers = 3;           // not within 4 lasers -> allow at most 3 nearby lanes
+
+        let best = null;
+        let bestScore = -1;
+
+        for (let i = 0; i < tries; i++) {
+          // Sample away from edges
+          const x = rand(minBorder, 1 - minBorder);
+          const y = rand(minBorder + 0.02, 1 - minBorder);
+
+          // Must not overlap walls (with clearance)
+          if (pointBlocked(x, y, clearance)) continue;
+
+          // Must not be too close to exit (keeps gameplay non-trivial)
+          const exitCx = exit.x + exit.w * 0.5;
+          const exitCy = exit.y + exit.h * 0.5;
+          if (Math.hypot(x - exitCx, y - exitCy) < 0.10) continue;
+
+          // Laser safety constraints
+          if (laserDangerCount(x, y, safeLaserRadius) > maxNearLasers) continue;
+          if (minLaserDist(x, y) < minLaser) continue;
+
+          // Reachability over walls only: start -> heart and heart -> exit
+          const heartCandidate = { x, y, r: heart.r };
+          if (!isReachable(start, heartCandidate, { N: 76, r: girl.r })) continue;
+          if (!isReachable({ x, y }, exit, { N: 76, r: girl.r })) continue;
+
+          // Score: prefer not-near-edges, fewer nearby lasers, more laser clearance,
+          // and a gentle center preference.
+          const danger = laserDangerCount(x, y, safeLaserRadius);
+          const ml = minLaserDist(x, y);
+          const dc = Math.hypot(x - 0.5, y - 0.5);
+          const borderProx = Math.min(x, 1 - x, y, 1 - y);
+
+          const score =
+            (1.2 / (1 + danger)) +
+            (ml * 5.0) +
+            (borderProx * 1.2) -
+            (dc * 0.9);
+
+          if (score > bestScore) {
+            bestScore = score;
+            best = { x, y };
+          }
+        }
+
+        if (best) {
+          heart.x = best.x;
+          heart.y = best.y;
+          return true;
+        }
+
+        // Fallback: still not a corner
+        heart.x = 0.52;
+        heart.y = 0.88;
+        return false;
+      }
+
+function buildLevel(level) {
+        world.level = level;
+        world.running = false;
+        world.hasHeart = false;
+        world.won = false;
+        world.dead = false;
+        world.won = false;
+        world.dead = false;
+        world.t = 0;
+        world.shield = false;
+        world.timeParams = { active: false, timer: 0 };
+        updatePowerHud();
+
+        levelPill.textContent = `Level: ${level}`;
+        statusPill.textContent = "Status: Sneaking";
+
+        girl.x = 0.10;
+        girl.y = 0.86;
+        girl.vx = 0;
+        girl.vy = 0;
+
+        // Walls: rectangles in normalized coordinates
+        walls = [
+          // outer soft border blocks (invisible collision frame)
+          { x: 0.00, y: 0.00, w: 1.00, h: 0.03 },
+          { x: 0.00, y: 0.97, w: 1.00, h: 0.03 },
+          { x: 0.00, y: 0.00, w: 0.03, h: 1.00 },
+          { x: 0.97, y: 0.00, w: 0.03, h: 1.00 },
+
+          // interior museum partitions
+          { x: 0.10, y: 0.15, w: 0.55, h: 0.05 },
+          { x: 0.10, y: 0.35, w: 0.38, h: 0.05 },
+          { x: 0.52, y: 0.35, w: 0.13, h: 0.35 },
+          { x: 0.18, y: 0.55, w: 0.34, h: 0.05 },
+          { x: 0.18, y: 0.72, w: 0.55, h: 0.05 }
+        ];
+
+        // Dynamic complexity: Moving walls (Security doors)
+        if (level >= 4) {
+          walls.push({
+            x: 0.65, y: 0.20, w: 0.03, h: 0.20,
+            move: 'y', min: 0.15, max: 0.65, spd: 0.15, dir: 1
+          });
+          walls.push({
+            x: 0.82, y: 0.50, w: 0.03, h: 0.25,
+            move: 'y', min: 0.40, max: 0.80, spd: 0.20, dir: -1
+          });
+        }
+        if (level >= 6) {
+          walls.push({
+            x: 0.30, y: 0.80, w: 0.25, h: 0.03,
+            move: 'x', min: 0.20, max: 0.60, spd: 0.25, dir: 1
+          });
+        }
+
+        // Heart + exit positions
+        // Moved heart to bottom center (reachable) so the challenge is the escape
+        heart = { x: 0.50, y: 0.92, r: 0.030 }; // default, may be overridden
+        exit = { x: 0.90, y: 0.10, w: 0.07, h: 0.10 };
+
+        // Lasers
+        lasers = [];
+
+        // Predefined laser “lanes”
+        // Further adjusted x1 to 0.22 for extra wide safe corridor
+        const lanes = [
+          { x1: 0.22, y1: 0.28, x2: 0.66, y2: 0.28 },
+          { x1: 0.22, y1: 0.48, x2: 0.48, y2: 0.48 }, // shortened x2 to leave mid gap
+          { x1: 0.22, y1: 0.66, x2: 0.85, y2: 0.66 }, // shortened x2
+          { x1: 0.72, y1: 0.22, x2: 0.72, y2: 0.66 },
+          { x1: 0.34, y1: 0.22, x2: 0.34, y2: 0.48 },
+          { x1: 0.58, y1: 0.48, x2: 0.88, y2: 0.48 },
+          { x1: 0.22, y1: 0.84, x2: 0.88, y2: 0.84 },
+          { x1: 0.86, y1: 0.20, x2: 0.86, y2: 0.88 }
+        ];
+
+        // Cap count to unique lanes to prevent "wall of death" overlapping lasers
+        const baseCount = 5;
+        const maxSupported = lanes.length;
+        // Slower difficulty ramp: Level 2 adds 0 extra. Level 3 adds 1.
+        const extra = Math.min(maxSupported - baseCount, Math.floor((level - 1) * 0.6));
+        const count = baseCount + extra;
+
+        // Pick lanes and assign oscillation
+        const shuffled = lanes.slice().sort(() => Math.random() - 0.5);
+        for (let i = 0; i < count; i++) {
+          const L = shuffled[i]; // No modulo, strict unique lanes
+          // Speed ramps up
+          const speed = rand(0.7, 1.25) + (level - 1) * 0.10;
+          const width = 0.010 + Math.min(0.012, (level - 1) * 0.0018);
+          const phase = rand(0, Math.PI * 2);
+
+          // Moving lasers: we "wiggle" endpoints along perpendicular direction
+          lasers.push({ ...L, phase, speed, width, amp: rand(0.010, 0.028) });
+        }
+
+        // Powers: chance to spawn
+        powerups = [];
+        if (level >= 2) {
+          // Shield
+          if (Math.random() < 0.6) {
+            let px, py;
+            // distinct spot
+            do { px = rand(0.1, 0.9); py = rand(0.1, 0.9); } while (circleRectCollide(px, py, 0.05, heart.x - 0.1, heart.y - 0.1, 0.2, 0.2));
+            powerups.push({ x: px, y: py, r: 0.025, type: 'SHIELD', collected: false });
+          }
+          // Time
+          if (level >= 3 && Math.random() < 0.5) {
+            powerups.push({ x: rand(0.1, 0.9), y: rand(0.1, 0.9), r: 0.025, type: 'TIME', collected: false });
+          }
+        }
+
+        // Randomize heart position per level (safe + reachable)
+        placeHeartRandom();
+      }
+
+      function start() {
+        world.running = true;
+        world.dead = false;
+        world.won = false;
+        hideOverlay();
+        a11y.textContent = "Game started.";
+      }
+
+      function reset() {
+        buildLevel(world.level);
+        showOverlay("Mission briefing", "Steal the heart artifact. Avoid lasers. Reach the exit.", "Start", true);
+      }
+
+      function win() {
+        world.running = false;
+        world.won = true;
+        statusPill.textContent = "Status: Escaped 💘";
+        floatiesBurst();
+        showOverlay(
+          "Heist complete",
+          "Happy 6th day of the love month, Soline.",
+          "Continue",
+          true
+        );
+        a11y.textContent = "Won.";
+      }
+
+      function die() {
+        world.running = false;
+        world.dead = true;
+        statusPill.textContent = "Status: Caught";
+        showOverlay(
+          "Laser touched",
+          "Try again. Tiny steps, steady hands.",
+          "Retry",
+          true
+        );
+        a11y.textContent = "Lost.";
+      }
+
+      function move(dt) {
+        // Slow motion factor
+        const timeScale = world.timeParams.active ? 0.4 : 1.0;
+
+        const speed = (0.30 + Math.min(0.10, (world.level - 1) * 0.015)) * (world.timeParams.active ? 1.2 : 1.0); // girl slightly faster in time freeze? or normal speed while others slow? Let's keep her fast.
+        let ax = 0, ay = 0;
+
+        if (keys.left) ax -= 1;
+        if (keys.right) ax += 1;
+        if (keys.up) ay -= 1;
+        if (keys.down) ay += 1;
+
+        if (touchActive) {
+          const dx = touchTarget.x - girl.x;
+          const dy = touchTarget.y - girl.y;
+          const d = Math.hypot(dx, dy);
+          if (d > 0.002) {
+            ax += dx / d;
+            ay += dy / d;
+          }
+        }
+
+        // Normalize movement so diagonals are not faster
+        const mag = Math.hypot(ax, ay);
+        if (mag > 0) {
+          ax /= mag;
+          ay /= mag;
+        }
+
+        const nx = girl.x + ax * speed * dt;
+        const ny = girl.y + ay * speed * dt;
+
+        // collisions with walls (simple, separate axis)
+        let px = nx, py = girl.y;
+        for (const w of walls) {
+          if (circleRectCollide(px, py, girl.r, w.x, w.y, w.w, w.h)) {
+            px = girl.x; break;
+          }
+        }
+        py = ny;
+        for (const w of walls) {
+          if (circleRectCollide(px, py, girl.r, w.x, w.y, w.w, w.h)) {
+            py = girl.y; break;
+          }
+        }
+
+        girl.x = clamp(px, 0.03 + girl.r, 0.97 - girl.r);
+        girl.y = clamp(py, 0.03 + girl.r, 0.97 - girl.r);
+      }
+
+      function laserEndpoints(L, t) {
+        // perpendicular wiggle
+        // Apply time dilation to wiggle speed
+        const effectiveT = t; // passed t is already scaled in step()
+        const dx = L.x2 - L.x1, dy = L.y2 - L.y1;
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const w = Math.sin(t * L.speed + L.phase) * L.amp;
+
+        return {
+          x1: L.x1 + nx * w, y1: L.y1 + ny * w,
+          x2: L.x2 + nx * w, y2: L.y2 + ny * w
+        };
+      }
+
+      function checkInteractions() {
+        // powers
+        for (const p of powerups) {
+          if (p.collected) continue;
+          const d = Math.hypot(girl.x - p.x, girl.y - p.y);
+          if (d < (girl.r + p.r)) {
+            p.collected = true;
+            if (p.type === 'SHIELD') {
+              world.shield = true;
+              statusPill.textContent = "Status: Shielded";
+            } else if (p.type === 'TIME') {
+              world.timeParams.active = true;
+              world.timeParams.timer = 5.0; // 5 seconds
+              statusPill.textContent = "Status: Time Frozen";
+            }
+            updatePowerHud();
+          }
+        }
+
+        // heart pickup
+        if (!world.hasHeart) {
+          const d = Math.hypot(girl.x - heart.x, girl.y - heart.y);
+          if (d < (girl.r + heart.r) * 0.92) {
+            world.hasHeart = true;
+            statusPill.textContent = "Status: Artifact secured";
+          }
+        }
+
+        // exit
+        if (world.hasHeart) {
+          const inExit = circleRectCollide(girl.x, girl.y, girl.r, exit.x, exit.y, exit.w, exit.h);
+          if (inExit) {
+            win();
+          }
+        }
+
+        // lasers
+        const laserHitPad = 0.006 + Math.min(0.008, (world.level - 1) * 0.0008);
+        for (const L of lasers) {
+          const P = laserEndpoints(L, world.t);
+          const d = distPointToSegment(girl.x, girl.y, P.x1, P.y1, P.x2, P.y2);
+          if (d < (L.width + girl.r * 0.45 + laserHitPad)) {
+            if (world.shield) {
+              world.shield = false;
+              // Push back slightly?
+              girl.x -= (girl.vx || 0) * 0.1; // simple bounce
+              statusPill.textContent = "Status: Shield Broke!";
+              updatePowerHud();
+              // Invuln frame? nah, just break shield and remove laser collision for this frame conceptually? 
+              // Simplest: Shield absorbs hit, remove ONLY THIS interaction frame. 
+              // But loop continues. We need to prevent instant death next frame if still touching.
+              // For now: Just die if shield gone. Enhancing: Add invuln time or bounce.
+              // Let's bounce girl away from laser? Complex. 
+              // Instead: Temporary Invulnerability or just accept shield breaks one FRAME.
+              // If we are still in laser next frame, we die. So we need a "grace" period after shield break.
+              // Let's add simple grace.
+              world.grace = 1.0;
+              return;
+            }
+            if (world.grace > 0) return;
+            die();
+            return;
+          }
+        }
+      }
+
+      function updatePowerHud() {
+        const hud = document.getElementById('powerHud');
+        const s = document.getElementById('shieldPill');
+        const t = document.getElementById('timePill');
+        if (world.shield || world.timeParams.active) {
+          hud.style.opacity = 1;
+          s.style.display = world.shield ? 'block' : 'none';
+          t.style.display = world.timeParams.active ? 'block' : 'none';
+        } else {
+          hud.style.opacity = 0;
+        }
+      }
+
+      function drawMuseum() {
+        // floor grid
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,.04)";
+        ctx.fillRect(0, 0, W, H);
+
+        // subtle tiles
+        ctx.strokeStyle = "rgba(255,255,255,.05)";
+        ctx.lineWidth = 1 * dpr;
+        const step = 34 * dpr;
+        for (let x = 0; x <= W; x += step) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y <= H; y += step) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Louvre vibe: pyramid silhouette at top center
+        ctx.save();
+        ctx.translate(W * 0.50, H * 0.18);
+        ctx.strokeStyle = "rgba(34,211,238,.14)";
+        ctx.lineWidth = 2 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(-90 * dpr, 70 * dpr);
+        ctx.lineTo(0, -50 * dpr);
+        ctx.lineTo(90 * dpr, 70 * dpr);
+        ctx.closePath();
+        ctx.stroke();
+        // pyramid grid
+        for (let i = 1; i <= 6; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-90 * dpr + i * (180 * dpr / 7), 70 * dpr);
+          ctx.lineTo(0, -50 * dpr);
+          ctx.stroke();
+        }
+        for (let i = 1; i <= 4; i++) {
+          ctx.beginPath();
+          ctx.moveTo(-90 * dpr, 70 * dpr - i * 24 * dpr);
+          ctx.lineTo(90 * dpr, 70 * dpr - i * 24 * dpr);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // "frames" on walls (decor) with Specific Louvre Art
+        ctx.save();
+        // Define varied frame styles
+        const frames = [
+          // Mona Lisa (Portrait)
+          { x: 0.08, y: 0.08, w: 0.08, h: 0.10, type: 'mona' },
+          // Venus de Milo (Statue)
+          { x: 0.20, y: 0.08, w: 0.09, h: 0.12, type: 'venus' },
+          // Liberty Leading the People (Tricolor flag)
+          { x: 0.35, y: 0.09, w: 0.20, h: 0.09, type: 'liberty' },
+          // Sphinx (Antiquity)
+          { x: 0.60, y: 0.10, w: 0.10, h: 0.08, type: 'sphinx' },
+          // Crown Jewels (Object)
+          { x: 0.76, y: 0.10, w: 0.09, h: 0.07, type: 'crown' },
+        ];
+
+        for (const f of frames) {
+          const fx = toPxX(f.x), fy = toPxY(f.y), fw = toPxX(f.w), fh = toPxY(f.h);
+
+          // Ornate Frame border
+          ctx.strokeStyle = (f.type === 'venus' || f.type === 'sphinx') ? "rgba(255,255,255,.15)" : "#eab308"; // Gold for paintings, Stone for others? No, all frames usually gold or stands
+          ctx.lineWidth = 3 * dpr;
+          ctx.beginPath();
+          ctx.roundRect(fx, fy, fw, fh, 4 * dpr);
+          ctx.stroke();
+
+          // Canvas fill
+          ctx.fillStyle = "#1e1b18"; // dark backing
+          ctx.beginPath();
+          ctx.roundRect(fx + 2 * dpr, fy + 2 * dpr, fw - 4 * dpr, fh - 4 * dpr, 2 * dpr);
+          ctx.fill();
+
+          ctx.save();
+          ctx.clip(); // Clip drawing to frame
+          ctx.translate(fx, fy);
+
+          if (f.type === 'mona') {
+            // Background landscape
+            ctx.fillStyle = "#3f4638";
+            ctx.fillRect(0, 0, fw, fh);
+            // Figure
+            ctx.fillStyle = "#dcb18c"; // skin
+            ctx.beginPath(); ctx.arc(fw * 0.5, fh * 0.4, fw * 0.25, 0, Math.PI * 2); ctx.fill();
+            // Hair
+            ctx.fillStyle = "#0f0f0f";
+            ctx.beginPath(); ctx.arc(fw * 0.5, fh * 0.4, fw * 0.28, Math.PI, Math.PI * 2); ctx.fill();
+            ctx.fillRect(fw * 0.2, fh * 0.4, fw * 0.15, fh * 0.4);
+            ctx.fillRect(fw * 0.65, fh * 0.4, fw * 0.15, fh * 0.4);
+            // Dress
+            ctx.fillStyle = "#26211e";
+            ctx.beginPath(); ctx.ellipse(fw * 0.5, fh * 1.1, fw * 0.4, fh * 0.5, 0, 0, Math.PI * 2); ctx.fill();
+          } else if (f.type === 'venus') {
+            // Niche background
+            ctx.fillStyle = "#334155";
+            ctx.fillRect(0, 0, fw, fh);
+            ctx.fillStyle = "#1e293b";
+            ctx.beginPath(); ctx.ellipse(fw * 0.5, fh * 0.5, fw * 0.4, fh * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+            // Statue
+            ctx.fillStyle = "#e2e8f0";
+            ctx.beginPath();
+            ctx.moveTo(fw * 0.5, fh * 0.2);
+            ctx.bezierCurveTo(fw * 0.7, fh * 0.3, fw * 0.3, fh * 0.5, fw * 0.6, fh * 0.8);
+            ctx.lineTo(fw * 0.4, fh * 0.8);
+            ctx.bezierCurveTo(fw * 0.1, fh * 0.5, fw * 0.6, fh * 0.3, fw * 0.5, fh * 0.2);
+            ctx.fill();
+          } else if (f.type === 'liberty') {
+            // Sky
+            ctx.fillStyle = "#64748b";
+            ctx.fillRect(0, 0, fw, fh);
+            // Smoke
+            ctx.fillStyle = "rgba(255,255,255,0.2)";
+            ctx.beginPath(); ctx.arc(fw * 0.8, fh * 0.8, fw * 0.3, 0, Math.PI * 2); ctx.fill();
+            // Crowd heap
+            ctx.fillStyle = "#0f172a";
+            ctx.beginPath(); ctx.ellipse(fw * 0.5, fh * 1.0, fw * 0.6, fh * 0.4, 0, 0, Math.PI * 2); ctx.fill();
+            // Marianne
+            ctx.fillStyle = "#fcd34d"; // dress/skin
+            ctx.beginPath(); ctx.moveTo(fw * 0.45, fh * 0.7); ctx.lineTo(fw * 0.55, fh * 0.4); ctx.lineTo(fw * 0.6, fh * 0.7); ctx.fill();
+            // Flag
+            ctx.fillStyle = "#1d4ed8"; // blue
+            ctx.fillRect(fw * 0.55, fh * 0.2, fw * 0.04, fh * 0.25);
+            ctx.fillStyle = "#fff"; // white
+            ctx.fillRect(fw * 0.59, fh * 0.2, fw * 0.04, fh * 0.25);
+            ctx.fillStyle = "#ef4444"; // red
+            ctx.fillRect(fw * 0.63, fh * 0.2, fw * 0.04, fh * 0.25);
+            // Pole
+            ctx.strokeStyle = "#475569";
+            ctx.lineWidth = 1 * dpr;
+            ctx.beginPath(); ctx.moveTo(fw * 0.55, fh * 0.45); ctx.lineTo(fw * 0.55, fh * 0.7); ctx.stroke();
+          } else if (f.type === 'sphinx') {
+            // Desert
+            ctx.fillStyle = "#d97706";
+            ctx.fillRect(0, 0, fw, fh);
+            // Sphinx body
+            ctx.fillStyle = "#fcd34d";
+            ctx.beginPath();
+            ctx.moveTo(fw * 0.2, fh * 0.8);
+            ctx.lineTo(fw * 0.8, fh * 0.8);
+            ctx.lineTo(fw * 0.7, fh * 0.5);
+            ctx.lineTo(fw * 0.6, fh * 0.3); // head
+            ctx.lineTo(fw * 0.4, fh * 0.5);
+            ctx.closePath();
+            ctx.fill();
+          } else if (f.type === 'crown') {
+            // Velvet
+            ctx.fillStyle = "#450a0a";
+            ctx.fillRect(0, 0, fw, fh);
+            // Crown
+            ctx.fillStyle = "#fbbf24";
+            ctx.beginPath();
+            ctx.moveTo(fw * 0.2, fh * 0.7);
+            ctx.lineTo(fw * 0.8, fh * 0.7);
+            ctx.lineTo(fw * 0.9, fh * 0.4);
+            ctx.lineTo(fw * 0.5, fh * 0.3);
+            ctx.lineTo(fw * 0.1, fh * 0.4);
+            ctx.closePath();
+            ctx.fill();
+            // Gem
+            ctx.fillStyle = "#ef4444";
+            ctx.beginPath(); ctx.arc(fw * 0.5, fh * 0.5, fw * 0.08, 0, Math.PI * 2); ctx.fill();
+          }
+
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawWalls() {
+        ctx.save();
+        ctx.fillStyle = "rgba(255,255,255,.08)";
+        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        ctx.lineWidth = 2 * dpr;
+        for (const w of walls) {
+          // draw only interior walls, skip the border collision frame for aesthetics
+          const isBorder = (w.x === 0 && w.y === 0) || (w.y === 0) || (w.x === 0) || (w.x > 0.9) || (w.y > 0.9);
+          if (isBorder) continue;
+          ctx.beginPath();
+          ctx.roundRect(toPxX(w.x), toPxY(w.y), toPxX(w.w), toPxY(w.h), 14 * dpr);
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      function drawExit() {
+        ctx.save();
+        const x = toPxX(exit.x), y = toPxY(exit.y), w = toPxX(exit.w), h = toPxY(exit.h);
+        ctx.fillStyle = world.hasHeart ? "rgba(34,211,238,.18)" : "rgba(255,255,255,.06)";
+        ctx.strokeStyle = world.hasHeart ? "rgba(34,211,238,.34)" : "rgba(255,255,255,.14)";
+        ctx.lineWidth = 2 * dpr;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, 14 * dpr);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(238,240,255,.70)";
+        ctx.font = `${Math.floor(12 * dpr)}px ui-sans-serif`;
+        ctx.fillText("EXIT", x + 12 * dpr, y + 22 * dpr);
+        ctx.restore();
+      }
+
+      function drawHeart() {
+        if (world.hasHeart) return;
+        const cx = toPxX(heart.x), cy = toPxY(heart.y);
+        const r = heart.r * Math.min(W, H);
+        const pulse = 0.92 + (Math.sin(world.t * 3.4) * 0.08);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(pulse, pulse);
+        ctx.fillStyle = "rgba(244,114,182,.22)";
+        ctx.strokeStyle = "rgba(244,114,182,.42)";
+        ctx.lineWidth = 2 * dpr;
+
+        // heart shape
+        ctx.beginPath();
+        ctx.moveTo(0, r * 0.9);
+        ctx.bezierCurveTo(r * 1.2, r * 0.2, r * 0.8, -r * 0.8, 0, -r * 0.25);
+        ctx.bezierCurveTo(-r * 0.8, -r * 0.8, -r * 1.2, r * 0.2, 0, r * 0.9);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // glow
+        ctx.shadowColor = "rgba(244,114,182,.22)";
+        ctx.shadowBlur = 24 * dpr;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawLasers() {
+        ctx.save();
+        for (const L of lasers) {
+          const P = laserEndpoints(L, world.t);
+
+          // convert to pixels
+          const x1 = toPxX(P.x1), y1 = toPxY(P.y1);
+          const x2 = toPxX(P.x2), y2 = toPxY(P.y2);
+
+          // main beam
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+
+          // glow layer
+          ctx.strokeStyle = "rgba(244,114,182,.18)";
+          ctx.lineWidth = (L.width * Math.min(W, H) + 10 * dpr);
+          ctx.shadowColor = "rgba(244,114,182,.18)";
+          ctx.shadowBlur = 18 * dpr;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+
+          // core beam
+          ctx.shadowBlur = 0;
+          ctx.strokeStyle = "rgba(244,114,182,.70)";
+          ctx.lineWidth = (L.width * Math.min(W, H) + 2 * dpr);
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+
+          // nodes
+          ctx.fillStyle = "rgba(34,211,238,.26)";
+          ctx.beginPath(); ctx.arc(x1, y1, 4 * dpr, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath(); ctx.arc(x2, y2, 4 * dpr, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawGirl() {
+        const x = toPxX(girl.x), y = toPxY(girl.y);
+        const r = girl.r * Math.min(W, H);
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // shadow
+        ctx.globalAlpha = 0.35;
+        ctx.fillStyle = "rgba(0,0,0,.65)";
+        ctx.beginPath();
+        ctx.ellipse(0, r * 1.15, r * 1.0, r * 0.35, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // head
+        ctx.fillStyle = "rgba(255,225,210,.95)";
+        ctx.beginPath();
+        ctx.arc(0, -r * 0.55, r * 0.55, 0, Math.PI * 2);
+        ctx.fill();
+
+        // hair
+        ctx.fillStyle = "rgba(35,26,38,.95)";
+        ctx.beginPath();
+        ctx.arc(-r * 0.12, -r * 0.62, r * 0.62, Math.PI, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(-r * 0.55, -r * 0.35, r * 0.38, r * 0.55, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // body
+        ctx.fillStyle = "rgba(168,85,247,.82)";
+        ctx.beginPath();
+        ctx.roundRect(-r * 0.50, -r * 0.05, r * 1.0, r * 1.25, r * 0.35);
+        ctx.fill();
+
+        // tiny legs
+        const step = Math.sin(world.t * 10) * (world.running ? 1 : 0);
+        ctx.strokeStyle = "rgba(255,225,210,.9)";
+        ctx.lineWidth = 3 * dpr;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.18, r * 1.10);
+        ctx.lineTo(-r * 0.18 + step * r * 0.08, r * 1.50);
+        ctx.moveTo(r * 0.18, r * 1.10);
+        ctx.lineTo(r * 0.18 - step * r * 0.08, r * 1.50);
+        ctx.stroke();
+
+        // eyes dot
+        ctx.fillStyle = "rgba(20,20,30,.7)";
+        ctx.beginPath();
+        ctx.arc(r * 0.18, -r * 0.58, 1.6 * dpr, 0, Math.PI * 2);
+        ctx.fill();
+
+        // glow ring when carrying heart
+        if (world.hasHeart) {
+          ctx.strokeStyle = "rgba(34,211,238,.40)";
+          ctx.lineWidth = 2 * dpr;
+          ctx.shadowColor = "rgba(34,211,238,.22)";
+          ctx.shadowBlur = 16 * dpr;
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 1.35, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawPowerups() {
+        for (const p of powerups) {
+          if (p.collected) continue;
+          const px = toPxX(p.x), py = toPxY(p.y);
+          const r = p.r * Math.min(W, H);
+          ctx.save();
+          ctx.translate(px, py);
+          // bob
+          const bob = Math.sin(world.t * 4) * 5 * dpr;
+          ctx.translate(0, bob);
+
+          if (p.type === 'SHIELD') {
+            ctx.fillStyle = "rgba(34, 211, 238, 0.2)";
+            ctx.strokeStyle = "#22d3ee";
+            ctx.lineWidth = 2 * dpr;
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = "#fff";
+            ctx.font = (16 * dpr) + "px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("🛡️", 0, 0);
+          } else {
+            ctx.fillStyle = "rgba(251, 191, 36, 0.2)";
+            ctx.strokeStyle = "#fbbf24";
+            ctx.lineWidth = 2 * dpr;
+            ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = "#fff";
+            ctx.font = (16 * dpr) + "px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("⏳", 0, 0);
+          }
+          ctx.restore();
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        drawMuseum();
+        drawWalls();
+        drawExit();
+        drawHeart();
+        drawPowerups();
+        drawLasers();
+        drawGirl();
+
+        // subtle vignette
+        ctx.save();
+        const g = ctx.createRadialGradient(W * 0.5, H * 0.35, 0, W * 0.5, H * 0.35, Math.max(W, H) * 0.75);
+        g.addColorStop(0, "rgba(0,0,0,0)");
+        g.addColorStop(1, "rgba(0,0,0,.45)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+        ctx.restore();
+      }
+
+      function step(dt) {
+        // Time dilation update
+        let simDt = dt;
+        if (world.timeParams.active) {
+          world.timeParams.timer -= dt;
+          if (world.timeParams.timer <= 0) {
+            world.timeParams.active = false;
+            statusPill.textContent = "Status: Time Flow Normal";
+            updatePowerHud();
+          } else {
+            simDt = dt * 0.4; // Slow down world
+          }
+        }
+
+        if (world.grace > 0) world.grace -= dt;
+
+        world.t += simDt;
+
+        if (world.running) {
+          // Move walls
+          const wallDt = simDt; // walls slow down in time freeze too
+          for (const w of walls) {
+            if (w.move) {
+              if (w.move === 'x') {
+                w.x += w.spd * w.dir * wallDt;
+                if (w.x > w.max) { w.x = w.max; w.dir *= -1; }
+                if (w.x < w.min) { w.x = w.min; w.dir *= -1; }
+              } else {
+                w.y += w.spd * w.dir * wallDt;
+                if (w.y > w.max) { w.y = w.max; w.dir *= -1; }
+                if (w.y < w.min) { w.y = w.min; w.dir *= -1; }
+              }
+            }
+          }
+
+          move(dt); // move logic handles its own speed caps? Actually move should use simDt for consistency? 
+          // Wait, if time freeze, GIRL should be fast (normal speed) but world slow.
+          // So world.t increments slowly (lasers oscillate slow).
+          // But move() needs dt.
+          // We passed 'dt' to move(). In move(), we speed up girl if time active.
+
+          checkInteractions();
+        }
+      }
+
+      function loop() {
+        cancelAnimationFrame(raf);
+        let last = performance.now();
+        const tick = (now) => {
+          const dt = Math.min(0.033, (now - last) / 1000);
+          last = now;
+
+          step(dt);
+          draw();
+
+          raf = requestAnimationFrame(tick);
+        };
+        raf = requestAnimationFrame(tick);
+      }
+
+      // Input
+      function setKey(code, down) {
+        if (code === "ArrowUp" || code === "KeyW") keys.up = down;
+        if (code === "ArrowDown" || code === "KeyS") keys.down = down;
+        if (code === "ArrowLeft" || code === "KeyA") keys.left = down;
+        if (code === "ArrowRight" || code === "KeyD") keys.right = down;
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+          e.preventDefault();
+          setKey(e.code, true);
+        }
+        if (e.key === "r" || e.key === "R") {
+          e.preventDefault();
+          buildLevel(world.level);
+          start();
+        }
+      }, { passive: false });
+
+      window.addEventListener("keyup", (e) => {
+        setKey(e.code, false);
+      });
+
+      // Touch drag: follow finger
+      canvas.addEventListener("pointerdown", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const nx = (e.clientX - rect.left) / rect.width;
+        const ny = (e.clientY - rect.top) / rect.height;
+        touchActive = true;
+        touchTarget = { x: nx, y: ny };
+        canvas.setPointerCapture(e.pointerId);
+      });
+      canvas.addEventListener("pointermove", (e) => {
+        if (!touchActive) return;
+        const rect = canvas.getBoundingClientRect();
+        const nx = (e.clientX - rect.left) / rect.width;
+        const ny = (e.clientY - rect.top) / rect.height;
+        touchTarget = { x: nx, y: ny };
+      });
+      canvas.addEventListener("pointerup", () => { touchActive = false; });
+
+      // UI
+      startBtn.addEventListener("click", () => { start(); });
+      resetBtn.addEventListener("click", () => { reset(); });
+
+      overlayPrimary.addEventListener("click", () => {
+        const label = overlayPrimary.textContent.trim().toLowerCase();
+        if (label.includes("continue")) {
+          // next level harder
+          buildLevel(world.level + 1);
+          start();
+          return;
+        }
+        if (label.includes("retry")) {
+          buildLevel(world.level);
+          start();
+          return;
+        }
+        start();
+      });
+
+      overlayHow.addEventListener("click", () => {
+        overlayTitle.textContent = "How to play";
+        overlayText.textContent =
+          "Move with arrow keys or WASD. Touch and drag on mobile. Avoid all laser beams. Grab the heart artifact, then go to EXIT.";
+      });
+
+      // Init
+      function init() {
+        resize();
+        buildLevel(1);
+        showOverlay("Mission briefing", "Steal the heart artifact from the Louvre. Avoid lasers. Reach the exit.", "Start", true);
+        loop();
+      }
+
+      window.addEventListener("resize", resize);
+      init();
+    })();
+  </script>
+</body>
+
+</html>
