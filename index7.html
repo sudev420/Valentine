@@ -1,0 +1,1214 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rose Catcher · Rose Day</title>
+  <style>
+    :root {
+      --bg0: #070712;
+      --bg1: #0d0b18;
+      --bg2: #160b14;
+      --card: rgba(255, 255, 255, 0.08);
+      --card2: rgba(255, 255, 255, 0.14);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.68);
+      --accent: #ff3f7a;
+      --accent2: #ffcc6a;
+      --good: #7CFFB2;
+      --bad: #ff6b6b;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 20% 20%, rgba(255, 63, 122, 0.18), transparent 55%),
+        radial-gradient(900px 650px at 80% 30%, rgba(255, 204, 106, 0.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 50%, var(--bg2));
+      overflow: hidden;
+    }
+
+    .wrap {
+      position: relative;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .panel {
+      width: min(980px, 96vw);
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+
+    .left {
+      padding: 18px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.15;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .pill {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255, 63, 122, 0.16);
+      border: 1px solid rgba(255, 63, 122, 0.22);
+      color: rgba(255, 255, 255, 0.88);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .k {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+
+    .v {
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: 650;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hearts {
+      display: inline-flex;
+      gap: 4px;
+      transform: translateY(1px);
+    }
+
+    .heart {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.8), transparent 55%),
+        linear-gradient(180deg, rgba(255, 63, 122, 0.95), rgba(255, 63, 122, 0.65));
+      clip-path: path("M5 9 C2.2 6.8 0.8 5.2 0.8 3.6 C0.8 2.2 1.8 1.2 3.2 1.2 C4 1.2 4.6 1.5 5 2 C5.4 1.5 6 1.2 6.8 1.2 C8.2 1.2 9.2 2.2 9.2 3.6 C9.2 5.2 7.8 6.8 5 9 Z");
+      opacity: 0.95;
+    }
+
+    .controls {
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .controls b {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 650;
+    }
+
+    .btnRow {
+      margin-top: auto;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 650;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: transform 140ms ease, background 140ms ease;
+      user-select: none;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    button:active {
+      transform: translateY(0px) scale(0.99);
+    }
+
+    .primary {
+      background: linear-gradient(180deg, rgba(255, 63, 122, 0.95), rgba(255, 63, 122, 0.70));
+      border: 1px solid rgba(255, 63, 122, 0.40);
+    }
+
+    .primary:hover {
+      background: linear-gradient(180deg, rgba(255, 63, 122, 1), rgba(255, 63, 122, 0.76));
+    }
+
+    .right {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 560px;
+    }
+
+    .topbar {
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .hud {
+      pointer-events: none;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hud .badge {
+      pointer-events: none;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(10px);
+    }
+
+    .progress {
+      width: 220px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255, 63, 122, 0.95), rgba(255, 204, 106, 0.92));
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 5;
+      padding: 18px;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal p {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      line-height: 1.5;
+      font-size: 14.5px;
+
+      /* FIX: prevent overflow */
+      max-width: 100%;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: normal;
+    }
+
+
+    .modal:before {
+      content: "";
+      position: absolute;
+      inset: -40px;
+      background: radial-gradient(400px 240px at 25% 15%, rgba(255, 63, 122, 0.22), transparent 60%),
+        radial-gradient(360px 240px at 80% 35%, rgba(255, 204, 106, 0.16), transparent 60%);
+      filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .modalInner {
+      position: relative;
+    }
+
+    .modal h2 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0.2px;
+    }
+
+    .modal p {
+      margin: 10px 0 0;
+      color: rgba(255, 255, 255, 0.84);
+      line-height: 1.5;
+      font-size: 14.5px;
+    }
+
+    .modal .row {
+      margin-top: 14px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tiny {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.60);
+      font-size: 12px;
+    }
+
+    .hint {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      z-index: 3;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.74);
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+      .panel {
+        grid-template-columns: 1fr;
+      }
+
+      .right {
+        min-height: 520px;
+      }
+
+      .progress {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="card left">
+        <div class="title">
+          <div>
+            <h1>Rose Catcher</h1>
+            <div class="sub">Catch roses, avoid thorns, gain powers, level up forever.</div>
+          </div>
+          <div class="pill">Rose Day Edition</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Level</div>
+            <div class="v"><span id="level">1</span></div>
+          </div>
+          <div class="stat">
+            <div class="k">Roses to next</div>
+            <div class="v"><span id="toNext">25</span></div>
+          </div>
+          <div class="stat">
+            <div class="k">Lives</div>
+            <div class="v">
+              <span class="hearts" id="lives"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="k">Roses caught</div>
+            <div class="v"><span id="caught">0</span></div>
+          </div>
+          <div class="stat">
+            <div class="k">Score</div>
+            <div class="v"><span id="score">0</span></div>
+          </div>
+          <div class="stat">
+            <div class="k">Power</div>
+            <div class="v"><span id="power">None</span></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div><b>Move:</b> Arrow keys or A D</div>
+          <div><b>Pause:</b> Space</div>
+          <div><b>Golden rose:</b> gives Magnet or Shield for a few seconds</div>
+          <div style="opacity:0.9">Tip: Combo boosts points. Thorns break combo.</div>
+        </div>
+
+        <div class="btnRow">
+          <button class="primary" id="startBtn">Start</button>
+          <button id="restartBtn">Restart</button>
+        </div>
+
+        <div class="tiny">First level unlocks the Rose Day message, then it becomes endless 🌹</div>
+      </div>
+
+      <div class="card right">
+        <div class="topbar">
+          <div class="hud">
+            <div class="badge">Combo <span id="combo">0</span></div>
+            <div class="badge">Best <span id="best">0</span></div>
+          </div>
+          <div class="hud">
+            <div class="badge">Level progress</div>
+            <div class="progress">
+              <div class="bar" id="bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint" id="hint">Press Start, then use ← →</div>
+        <canvas id="game" width="960" height="560"></canvas>
+
+        <div class="overlay" id="overlay">
+          <div class="modal">
+            <div class="modalInner">
+              <h2 id="modalTitle">Level cleared 🌹</h2>
+              <p id="modalText"></p>
+              <div class="row">
+                <button class="primary" id="continueBtn">Continue</button>
+                <button id="playAgain">Restart</button>
+                <button id="closeModal">Close</button>
+              </div>
+              <div class="tiny" id="modalTiny"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const caughtEl = document.getElementById("caught");
+    const scoreEl = document.getElementById("score");
+    const comboEl = document.getElementById("combo");
+    const bestEl = document.getElementById("best");
+    const barEl = document.getElementById("bar");
+    const livesEl = document.getElementById("lives");
+    const hintEl = document.getElementById("hint");
+
+    const levelEl = document.getElementById("level");
+    const toNextEl = document.getElementById("toNext");
+    const powerEl = document.getElementById("power");
+
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const overlay = document.getElementById("overlay");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalText = document.getElementById("modalText");
+    const modalTiny = document.getElementById("modalTiny");
+    const playAgain = document.getElementById("playAgain");
+    const closeModal = document.getElementById("closeModal");
+    const continueBtn = document.getElementById("continueBtn");
+
+    const MAX_LIVES = 3;
+
+    let running = false;
+    let paused = false;
+    let gameOver = false;
+
+    let score = 0;
+    let caught = 0;
+    let combo = 0;
+    let best = Number(localStorage.getItem("rose_best") || "0");
+    bestEl.textContent = best;
+
+    let lives = MAX_LIVES;
+
+    let level = 1;
+    let levelCaught = 0;
+    let levelGoal = 25;
+    let showedRoseDayMessage = false;
+
+    // Powers
+    // shield: ignores one thorn hit while active
+    // magnet: pulls nearby roses toward basket while active
+    let power = "none";
+    let powerTimer = 0; // seconds remaining
+    let shieldCharged = false;
+
+    const basket = {
+      x: canvas.width / 2,
+      y: canvas.height - 70,
+      w: 120,
+      h: 26,
+      vx: 0,
+      speed: 520
+    };
+
+    const items = [];
+    const particles = [];
+
+    let lastTime = 0;
+    let spawnTimer = 0;
+
+    // Difficulty base, scaled by level
+    let spawnEvery = 0.70;
+    let fallSpeed = 220;
+    let thornRate = 0.18;
+
+    function difficultyForLevel(L) {
+      // Smooth ramp
+      const spawn = Math.max(0.28, 0.72 - (L - 1) * 0.05);
+      const speed = Math.min(620, 220 + (L - 1) * 38);
+      const thorns = Math.min(0.42, 0.18 + (L - 1) * 0.025);
+      const bspd = Math.min(820, 520 + (L - 1) * 18);
+      return { spawn, speed, thorns, bspd };
+    }
+
+    function setDifficulty() {
+      const d = difficultyForLevel(level);
+      spawnEvery = d.spawn;
+      fallSpeed = d.speed;
+      thornRate = d.thorns;
+      basket.speed = d.bspd;
+    }
+
+    function reset() {
+      running = false;
+      paused = false;
+      gameOver = false;
+
+      score = 0;
+      caught = 0;
+      combo = 0;
+      lives = MAX_LIVES;
+
+      level = 1;
+      levelCaught = 0;
+      levelGoal = 25;
+      showedRoseDayMessage = false;
+
+      power = "none";
+      powerTimer = 0;
+      shieldCharged = false;
+
+      items.length = 0;
+      particles.length = 0;
+
+      spawnTimer = 0;
+      setDifficulty();
+
+      basket.x = canvas.width / 2;
+      basket.vx = 0;
+
+      updateUI();
+      hintEl.textContent = "Press Start, then use ← →";
+      hideModal();
+      draw(0);
+    }
+
+    function updateUI() {
+      caughtEl.textContent = caught;
+      scoreEl.textContent = score;
+      comboEl.textContent = combo;
+      bestEl.textContent = best;
+
+      levelEl.textContent = level;
+      toNextEl.textContent = Math.max(0, levelGoal - levelCaught);
+
+      const p = Math.min(1, levelCaught / levelGoal);
+      barEl.style.width = (p * 100).toFixed(1) + "%";
+
+      // power label
+      if (power === "none") powerEl.textContent = "None";
+      if (power === "shield") powerEl.textContent = `Shield ${Math.ceil(powerTimer)}s`;
+      if (power === "magnet") powerEl.textContent = `Magnet ${Math.ceil(powerTimer)}s`;
+
+      livesEl.innerHTML = "";
+      for (let i = 0; i < MAX_LIVES; i++) {
+        const d = document.createElement("span");
+        d.className = "heart";
+        d.style.opacity = i < lives ? "0.95" : "0.25";
+        livesEl.appendChild(d);
+      }
+    }
+
+    const keys = new Set();
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowLeft", "ArrowRight", " ", "a", "d", "A", "D"].includes(e.key)) e.preventDefault();
+      keys.add(e.key);
+
+      if (e.key === " ") {
+        if (!running) return;
+        paused = !paused;
+        hintEl.textContent = paused ? "Paused. Press Space to resume." : "Go go go 🌹";
+      }
+    }, { passive: false });
+
+    window.addEventListener("keyup", (e) => keys.delete(e.key));
+
+    startBtn.addEventListener("click", () => {
+      if (!running) {
+        running = true;
+        paused = false;
+        hintEl.textContent = "Go go go 🌹";
+        lastTime = performance.now();
+        requestAnimationFrame(loop);
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      reset();
+      running = true;
+      hintEl.textContent = "Go go go 🌹";
+      lastTime = performance.now();
+      requestAnimationFrame(loop);
+    });
+
+    playAgain.addEventListener("click", () => {
+      reset();
+      running = true;
+      hintEl.textContent = "Go go go 🌹";
+      lastTime = performance.now();
+      requestAnimationFrame(loop);
+    });
+
+    continueBtn.addEventListener("click", () => {
+      hideModal();
+      paused = false;
+      hintEl.textContent = `Level ${level} in progress 🌹`;
+    });
+
+    closeModal.addEventListener("click", () => hideModal());
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) hideModal(); });
+
+    function showModal(title, text, tiny = "") {
+      modalTitle.textContent = title;
+      modalText.textContent = text;
+      modalTiny.textContent = tiny;
+      overlay.classList.add("show");
+    }
+    function hideModal() {
+      overlay.classList.remove("show");
+    }
+
+    function spawn() {
+      const isThorn = Math.random() < thornRate;
+      const isGolden = !isThorn && Math.random() < 0.11;
+
+      const x = 40 + Math.random() * (canvas.width - 80);
+      const r = isThorn ? 15 : (isGolden ? 17 : 16);
+
+      items.push({
+        type: isThorn ? "thorn" : (isGolden ? "gold" : "rose"),
+        x, y: -30,
+        vy: fallSpeed * (0.86 + Math.random() * 0.38),
+        r,
+        spin: (Math.random() * 2 - 1) * 1.8,
+        rot: Math.random() * Math.PI * 2
+      });
+    }
+
+    function burstHearts(x, y, count = 10) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x, y,
+          vx: (Math.random() * 2 - 1) * 170,
+          vy: -120 - Math.random() * 170,
+          life: 0.9 + Math.random() * 0.5,
+          t: 0,
+          size: 7 + Math.random() * 7
+        });
+      }
+    }
+
+    function grantPower() {
+      // Alternate, but with a little randomness so it feels alive
+      const roll = Math.random();
+      if (roll < 0.5) {
+        power = "magnet";
+        powerTimer = 7.0;
+        shieldCharged = false;
+      } else {
+        power = "shield";
+        powerTimer = 8.0;
+        shieldCharged = true;
+      }
+    }
+
+    function loop(t) {
+      if (!running) return;
+
+      const dt = Math.min(0.033, (t - lastTime) / 1000);
+      lastTime = t;
+
+      if (!paused && !gameOver) {
+        update(dt);
+      }
+      draw(dt);
+
+      requestAnimationFrame(loop);
+    }
+
+    function levelUp() {
+      level += 1;
+      levelCaught = 0;
+      levelGoal = Math.round(25 + (level - 1) * 10);
+      setDifficulty();
+
+      paused = true;
+      hintEl.textContent = `Level ${level} ready 🌹`;
+
+      showModal(
+        `Level up 🌹 Level ${level}`,
+        "More roses, more thorns, more speed. You also get more chances to grab golden powers.",
+        `New goal: ${levelGoal} roses · Spawn faster · Fall faster`
+      );
+    }
+
+    function roseDayMessageOnce() {
+      if (showedRoseDayMessage) return;
+      showedRoseDayMessage = true;
+
+      paused = true;
+      hintEl.textContent = "A message for Soline 🌹";
+
+      const msg =
+        "Happy Rose Day, Soline. " +
+        "If love had a shape, it would be the small moments with you, quiet, warm, and always worth coming back to.";
+
+      showModal(
+        "You collected the roses 🌹",
+        msg,
+        "Press Continue to keep playing and level up."
+      );
+    }
+
+    function hitThorn() {
+      // Shield absorbs one thorn while active
+      if (power === "shield" && shieldCharged && powerTimer > 0) {
+        shieldCharged = false; // consume
+        burstHearts(basket.x, basket.y - 30, 16);
+        hintEl.textContent = "Shield saved you ✨";
+        return;
+      }
+
+      lives -= 1;
+      combo = 0;
+      burstHearts(basket.x, basket.y - 30, 10);
+
+      if (lives <= 0) {
+        gameOver = true;
+        paused = true;
+        hintEl.textContent = "Game over. Restart to try again.";
+        showModal(
+          "Thorns won this round 🌵",
+          "Want another run? Catch the golden rose early for a shield or magnet.",
+          `Best: ${best} · You reached Level ${level}`
+        );
+      }
+    }
+
+    function update(dt) {
+      // Basket movement
+      let dir = 0;
+      if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) dir -= 1;
+      if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) dir += 1;
+
+      basket.vx = dir * basket.speed;
+      basket.x += basket.vx * dt;
+      basket.x = Math.max(basket.w / 2 + 10, Math.min(canvas.width - basket.w / 2 - 10, basket.x));
+
+      // Power timer decay
+      if (power !== "none") {
+        powerTimer -= dt;
+        if (powerTimer <= 0) {
+          power = "none";
+          powerTimer = 0;
+          shieldCharged = false;
+          hintEl.textContent = "Power ended";
+        }
+      }
+
+      // Spawn items
+      spawnTimer += dt;
+      if (spawnTimer >= spawnEvery) {
+        spawnTimer = 0;
+        spawn();
+      }
+
+      // Update items
+      for (let i = items.length - 1; i >= 0; i--) {
+        const it = items[i];
+
+        // Magnet pulls roses toward basket
+        if (power === "magnet" && powerTimer > 0 && it.type !== "thorn") {
+          const dx = (basket.x - it.x);
+          const dy = (basket.y - 20 - it.y);
+          const dist = Math.hypot(dx, dy);
+          const magnetRadius = 190;
+          if (dist < magnetRadius) {
+            const pull = (1 - dist / magnetRadius);
+            it.x += (dx / Math.max(1, dist)) * (210 * pull) * dt;
+            it.y += (dy / Math.max(1, dist)) * (140 * pull) * dt;
+          }
+        }
+
+        it.y += it.vy * dt;
+        it.rot += it.spin * dt;
+
+        // Collision with basket
+        const bx1 = basket.x - basket.w / 2;
+        const bx2 = basket.x + basket.w / 2;
+        const by1 = basket.y - basket.h / 2;
+        const by2 = basket.y + basket.h / 2;
+
+        const closestX = Math.max(bx1, Math.min(it.x, bx2));
+        const closestY = Math.max(by1, Math.min(it.y, by2));
+        const dx = it.x - closestX;
+        const dy = it.y - closestY;
+
+        if (dx * dx + dy * dy < (it.r * it.r)) {
+          if (it.type === "thorn") {
+            hitThorn();
+          } else {
+            caught += 1;
+            levelCaught += 1;
+            combo += 1;
+
+            if (it.type === "gold") {
+              grantPower();
+              burstHearts(it.x, it.y, 18);
+              hintEl.textContent = power === "magnet" ? "Magnet on ✨" : "Shield on ✨";
+            } else {
+              burstHearts(it.x, it.y, 12);
+            }
+
+            const base = it.type === "gold" ? 22 : 12;
+            const comboBonus = Math.min(26, Math.floor(combo / 4) * 4);
+            score += base + comboBonus;
+
+            // First milestone message at end of level 1
+            if (level === 1 && levelCaught >= levelGoal) {
+              roseDayMessageOnce();
+              levelUp(); // queues next level modal after message, but message modal is already open
+              // Avoid stacking two modals: only do level up after Continue
+              // We handle by rolling back the immediate modal and scheduling level up
+              // Simpler: do not call levelUp() here, call after message Continue if still level cleared
+            }
+
+            // Level complete (except the special message moment handled below)
+            if (level !== 1 && levelCaught >= levelGoal) {
+              levelUp();
+            }
+
+            // Special case: level 1 completion
+            if (level === 1 && levelCaught >= levelGoal) {
+              // show message once, then advance level on Continue
+              if (showedRoseDayMessage) {
+                // already showed once in earlier run
+                levelUp();
+              } else {
+                // message shown in roseDayMessageOnce(); set up next level stats now
+                // but do not show level up modal on top
+                level += 1;
+                levelCaught = 0;
+                levelGoal = Math.round(25 + (level - 1) * 10);
+                setDifficulty();
+                // modal already open
+                modalTiny.textContent = `Now entering Level ${level} · New goal: ${levelGoal} roses`;
+              }
+            }
+          }
+
+          items.splice(i, 1);
+          updateUI();
+
+          if (score > best) {
+            best = score;
+            localStorage.setItem("rose_best", String(best));
+          }
+
+          continue;
+        }
+
+        // Fell off screen
+        if (it.y - it.r > canvas.height + 40) {
+          items.splice(i, 1);
+          if (it.type !== "thorn") {
+            combo = 0;
+          }
+        }
+      }
+
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.t += dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 380 * dt;
+        if (p.t >= p.life) particles.splice(i, 1);
+      }
+
+      updateUI();
+    }
+
+    // Rose drawing: layered petals + spiral center
+    function drawRose(x, y, r, rot, type = "rose") {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+
+      const isGold = type === "gold";
+
+      // Glow
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 2.0, 0, Math.PI * 2);
+      ctx.fillStyle = isGold ? "rgba(255,204,106,0.14)" : "rgba(255,63,122,0.14)";
+      ctx.fill();
+
+      // Stem hint
+      ctx.save();
+      ctx.rotate(-rot * 0.15);
+      ctx.beginPath();
+      ctx.moveTo(0, r * 0.6);
+      ctx.quadraticCurveTo(r * 0.05, r * 1.15, 0, r * 1.7);
+      ctx.strokeStyle = "rgba(124,255,178,0.22)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // leaf
+      ctx.beginPath();
+      ctx.ellipse(r * 0.45, r * 1.18, r * 0.55, r * 0.25, -0.6, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(124,255,178,0.18)";
+      ctx.fill();
+      ctx.restore();
+
+      // Petal palette
+      const petalA = isGold ? "rgba(255,204,106,0.95)" : "rgba(255,63,122,0.95)";
+      const petalB = isGold ? "rgba(255,180,80,0.75)" : "rgba(210,35,90,0.75)";
+      const edge = isGold ? "rgba(255,255,255,0.16)" : "rgba(255,255,255,0.14)";
+
+      // Outer petals (larger, more open)
+      ctx.strokeStyle = edge;
+      ctx.lineWidth = 1.2;
+      for (let ring = 0; ring < 3; ring++) {
+        const ringR = r * (1.10 - ring * 0.22);
+        const petals = 7 + ring * 2;
+        for (let i = 0; i < petals; i++) {
+          const a = (i / petals) * Math.PI * 2 + ring * 0.28;
+          ctx.save();
+          ctx.rotate(a);
+          const g = ctx.createLinearGradient(0, -ringR * 1.0, 0, ringR * 0.9);
+          g.addColorStop(0, petalA);
+          g.addColorStop(1, petalB);
+          ctx.fillStyle = g;
+
+          ctx.beginPath();
+          ctx.moveTo(0, -ringR * 0.85);
+          ctx.bezierCurveTo(ringR * 0.55, -ringR * 0.70, ringR * 0.65, -ringR * 0.10, 0, ringR * 0.15);
+          ctx.bezierCurveTo(-ringR * 0.65, -ringR * 0.10, -ringR * 0.55, -ringR * 0.70, 0, -ringR * 0.85);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // Inner swirl center
+      ctx.save();
+      ctx.rotate(0.35);
+      ctx.strokeStyle = isGold ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.50)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const turns = 2.3;
+      const steps = 44;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const ang = t * Math.PI * 2 * turns;
+        const rr = r * 0.10 + t * (r * 0.55);
+        const px = Math.cos(ang) * rr;
+        const py = Math.sin(ang) * rr;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+      ctx.fillStyle = isGold ? "rgba(255,255,255,0.65)" : "rgba(255,255,255,0.62)";
+      ctx.fill();
+      ctx.restore();
+
+      ctx.restore();
+    }
+
+    function drawThorn(x, y, r, rot) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rot);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,107,107,0.12)";
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(255,107,107,0.92)";
+      ctx.lineWidth = 3;
+      ctx.lineCap = "round";
+
+      for (let i = 0; i < 6; i++) {
+        ctx.rotate((Math.PI * 2) / 6);
+        ctx.beginPath();
+        ctx.moveTo(0, -r * 1.15);
+        ctx.lineTo(0, r * 0.15);
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.35, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255,0.80)";
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawBasket() {
+      const x = basket.x;
+      const y = basket.y;
+      const w = basket.w;
+      const h = basket.h;
+
+      // Shadow
+      ctx.beginPath();
+      ctx.ellipse(x, y + 26, w * 0.45, 12, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.22)";
+      ctx.fill();
+
+      // Body
+      const g = ctx.createLinearGradient(x, y - h, x, y + h);
+      g.addColorStop(0, "rgba(255,255,255,0.14)");
+      g.addColorStop(1, "rgba(255,255,255,0.06)");
+      ctx.fillStyle = g;
+      ctx.strokeStyle = "rgba(255,255,255,0.16)";
+      ctx.lineWidth = 2;
+
+      ctx.beginPath();
+      ctx.roundRect(x - w / 2, y - h / 2, w, h, 10);
+      ctx.fill();
+      ctx.stroke();
+
+      // Rim
+      ctx.beginPath();
+      ctx.roundRect(x - w / 2 + 8, y - h / 2 - 8, w - 16, 14, 10);
+      ctx.fillStyle = "rgba(255,255,255,0.10)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.12)";
+      ctx.stroke();
+
+      // Basket emblem rose
+      drawRose(x, y, 10, performance.now() / 9000, "rose");
+
+      // Power aura
+      if (power === "magnet" && powerTimer > 0) {
+        ctx.beginPath();
+        ctx.arc(x, y - 6, 105, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,204,106,0.18)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+      if (power === "shield" && powerTimer > 0) {
+        ctx.beginPath();
+        ctx.arc(x, y - 6, 95, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(124,255,178,0.22)";
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      }
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      for (let i = 0; i < 70; i++) {
+        const sx = (i * 97) % canvas.width;
+        const sy = (i * 53) % canvas.height;
+        const tw = (Math.sin((performance.now() / 900) + i) + 1) * 0.5;
+        ctx.globalAlpha = 0.22 + tw * 0.35;
+        ctx.fillRect(sx, sy, 2, 2);
+      }
+      ctx.globalAlpha = 1;
+
+      const g = ctx.createLinearGradient(0, canvas.height, 0, 0);
+      g.addColorStop(0, "rgba(255,63,122,0.16)");
+      g.addColorStop(0.45, "rgba(255,204,106,0.06)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const yy = 60 + i * 55;
+        ctx.beginPath();
+        ctx.moveTo(0, yy);
+        ctx.quadraticCurveTo(canvas.width * 0.5, yy + (Math.sin(performance.now() / 1500 + i) * 12), canvas.width, yy);
+        ctx.stroke();
+      }
+    }
+
+    function drawParticles() {
+      for (const p of particles) {
+        const a = 1 - (p.t / p.life);
+        ctx.globalAlpha = Math.max(0, a) * 0.9;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.t * 4);
+
+        ctx.fillStyle = "rgba(255,63,122,0.90)";
+        const s = p.size;
+        ctx.beginPath();
+        ctx.moveTo(0, s * 0.35);
+        ctx.bezierCurveTo(-s * 0.65, -s * 0.25, -s * 0.35, -s * 0.85, 0, -s * 0.45);
+        ctx.bezierCurveTo(s * 0.35, -s * 0.85, s * 0.65, -s * 0.25, 0, s * 0.35);
+        ctx.fill();
+
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawBackground();
+
+      for (const it of items) {
+        if (it.type === "thorn") drawThorn(it.x, it.y, it.r, it.rot);
+        else drawRose(it.x, it.y, it.r, it.rot, it.type);
+      }
+
+      drawBasket();
+      drawParticles();
+
+      if (!running) {
+        drawCenterText("Press Start", "Catch roses, level up, get powers");
+      } else if (paused && !overlay.classList.contains("show")) {
+        drawCenterText("Paused", "Press Space to continue");
+      }
+    }
+
+    function drawCenterText(big, small) {
+      ctx.save();
+      ctx.fillStyle = "rgba(0,0,0,0.25)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.textAlign = "center";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.font = "700 44px ui-sans-serif, system-ui";
+      ctx.fillText(big, canvas.width / 2, canvas.height / 2 - 8);
+
+      ctx.fillStyle = "rgba(255,255,255,0.72)";
+      ctx.font = "500 16px ui-sans-serif, system-ui";
+      ctx.fillText(small, canvas.width / 2, canvas.height / 2 + 24);
+      ctx.restore();
+    }
+
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+      CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        const rr = Math.min(r, w / 2, h / 2);
+        this.beginPath();
+        this.moveTo(x + rr, y);
+        this.arcTo(x + w, y, x + w, y + h, rr);
+        this.arcTo(x + w, y + h, x, y + h, rr);
+        this.arcTo(x, y + h, x, y, rr);
+        this.arcTo(x, y, x + w, y, rr);
+        this.closePath();
+        return this;
+      };
+    }
+
+    reset();
+  </script>
+</body>
+
+</html>
