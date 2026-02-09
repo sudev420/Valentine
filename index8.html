@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Soline I Promise…</title>
+  <style>
+    :root {
+      --shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
+      --r: 22px;
+    }
+
+    /* Night scene */
+    body.dark {
+      --bg1: #050816;
+      --bg2: #0b1230;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass2: rgba(255, 255, 255, 0.06);
+      --stroke: rgba(255, 255, 255, 0.14);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.68);
+      --good: #7cffb2;
+      --tileBg: rgba(255, 255, 255, 0.06);
+      --tileBgHover: rgba(255, 255, 255, 0.09);
+      --tileBorder: rgba(255, 255, 255, 0.14);
+      --hintOutline: rgba(122, 231, 255, 0.70);
+      --selOutline: rgba(177, 140, 255, 0.70);
+      --topGlow1: rgba(177, 140, 255, 0.22);
+      --topGlow2: rgba(122, 231, 255, 0.20);
+      --topGlow3: rgba(124, 255, 178, 0.12);
+      --loveOverlayBg: rgba(0, 0, 0, 0.62);
+      --modalBg: rgba(0, 0, 0, 0.55);
+      --toastBg: rgba(15, 20, 50, 0.75);
+      --cardHeadBg: rgba(0, 0, 0, 0.12);
+      --pageGrad1: #050816;
+      --pageGrad2: #0b1230;
+    }
+
+    /* Day scene */
+    body.light {
+      --bg1: #fff7f2;
+      --bg2: #e8f0ff;
+      --glass: rgba(255, 255, 255, 0.78);
+      --glass2: rgba(255, 255, 255, 0.62);
+      --stroke: rgba(20, 26, 58, 0.14);
+      --text: rgba(20, 26, 58, 0.92);
+      --muted: rgba(20, 26, 58, 0.68);
+      --good: #0aa66d;
+      --tileBg: rgba(255, 255, 255, 0.75);
+      --tileBgHover: rgba(255, 255, 255, 0.90);
+      --tileBorder: rgba(20, 26, 58, 0.14);
+      --hintOutline: rgba(20, 120, 180, 0.55);
+      --selOutline: rgba(120, 80, 180, 0.55);
+      --topGlow1: rgba(255, 180, 160, 0.40);
+      --topGlow2: rgba(160, 210, 255, 0.45);
+      --topGlow3: rgba(170, 255, 220, 0.30);
+      --loveOverlayBg: rgba(255, 255, 255, 0.35);
+      --modalBg: rgba(0, 0, 0, 0.30);
+      --toastBg: rgba(255, 255, 255, 0.78);
+      --cardHeadBg: rgba(255, 255, 255, 0.28);
+      --pageGrad1: #fff7f2;
+      --pageGrad2: #e8f0ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+      background:
+        radial-gradient(900px 700px at 15% 15%, var(--topGlow1), transparent 60%),
+        radial-gradient(900px 700px at 85% 25%, var(--topGlow2), transparent 60%),
+        radial-gradient(900px 700px at 50% 115%, var(--topGlow3), transparent 60%),
+        linear-gradient(180deg, var(--pageGrad1), var(--pageGrad2));
+      overflow-x: hidden;
+      transition: background 350ms ease, color 250ms ease;
+    }
+
+    .noise {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.08;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+      transition: opacity 250ms ease;
+    }
+
+    body.light .noise {
+      opacity: 0.05;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 26px 18px 46px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-top: 10px;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 46px);
+      letter-spacing: 0.3px;
+      line-height: 1.06;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+
+    .topPills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: var(--glass2);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
+      min-height: 40px;
+      user-select: none;
+      cursor: default;
+      transition: background 250ms ease, border-color 250ms ease;
+    }
+
+    .pill .k {
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      color: var(--text);
+    }
+
+    .pill .v {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .hero {
+        flex-direction: column;
+      }
+
+      .topPills {
+        justify-content: flex-start;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--glass), var(--glass2));
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      transition: background 250ms ease, border-color 250ms ease;
+    }
+
+    .cardHeader {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      background: var(--cardHeadBg);
+      transition: background 250ms ease;
+    }
+
+    body.light .cardHeader {
+      border-bottom: 1px solid rgba(20, 26, 58, 0.10);
+    }
+
+    .miniTitle {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .miniTitle .label {
+      font-size: 12px;
+      letter-spacing: 0.32px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .miniTitle .big {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      color: var(--text);
+      line-height: 1.35;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid var(--stroke);
+      background: var(--glass2);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      transition: transform 0.12s ease, background 0.2s ease, border-color 0.2s ease;
+      user-select: none;
+      min-height: 40px;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: var(--glass);
+      border-color: rgba(122, 231, 255, 0.34);
+    }
+
+    .btn:active {
+      transform: translateY(0px) scale(0.99);
+    }
+
+    .btn.primary {
+      border-color: rgba(122, 231, 255, 0.40);
+      background: linear-gradient(180deg, rgba(122, 231, 255, 0.16), rgba(177, 140, 255, 0.12));
+    }
+
+    body.light .btn.primary {
+      background: linear-gradient(180deg, rgba(60, 180, 255, 0.18), rgba(160, 120, 255, 0.14));
+    }
+
+    .btn.good {
+      border-color: rgba(124, 255, 178, 0.45);
+      background: linear-gradient(180deg, rgba(124, 255, 178, 0.14), rgba(122, 231, 255, 0.10));
+    }
+
+    body.light .btn.good {
+      border-color: rgba(10, 166, 109, 0.45);
+      background: linear-gradient(180deg, rgba(10, 166, 109, 0.16), rgba(60, 180, 255, 0.10));
+    }
+
+    .btn[disabled] {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .boardWrap {
+      padding: 16px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .tile {
+      min-height: 74px;
+      border-radius: 18px;
+      border: 1px solid var(--tileBorder);
+      background: var(--tileBg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px 10px;
+      font-weight: 950;
+      letter-spacing: 0.15px;
+      line-height: 1.18;
+      cursor: grab;
+      position: relative;
+      transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 14px 38px rgba(0, 0, 0, 0.20);
+      color: var(--text);
+    }
+
+    .tile:hover {
+      background: var(--tileBgHover);
+      transform: translateY(-1px);
+    }
+
+    .tile:active {
+      cursor: grabbing;
+    }
+
+    .tile.empty {
+      opacity: 0.62;
+      font-weight: 900;
+      color: var(--muted);
+    }
+
+    .tile.dragging {
+      opacity: 0.75;
+      transform: scale(1.02);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+      border-color: rgba(122, 231, 255, 0.45);
+    }
+
+    .tile.selected {
+      outline: 2px solid var(--selOutline);
+      outline-offset: 2px;
+      border-color: rgba(177, 140, 255, 0.45);
+      background: rgba(177, 140, 255, 0.10);
+    }
+
+    body.light .tile.selected {
+      border-color: rgba(120, 80, 180, 0.40);
+      background: rgba(120, 80, 180, 0.10);
+    }
+
+    .tile.hint {
+      outline: 2px solid var(--hintOutline);
+      outline-offset: 2px;
+      border-color: rgba(122, 231, 255, 0.42);
+    }
+
+    body.light .tile.hint {
+      border-color: rgba(20, 120, 180, 0.40);
+    }
+
+    .tile small {
+      position: absolute;
+      left: 10px;
+      bottom: 8px;
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 900;
+      letter-spacing: 0.35px;
+      text-transform: uppercase;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sideBlock {
+      padding: 16px;
+    }
+
+    .promiseText {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.65;
+      font-weight: 950;
+      color: var(--text);
+    }
+
+    .muted {
+      margin-top: 10px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .progressRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .bar {
+      flex: 1;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid var(--stroke);
+      overflow: hidden;
+      transition: background 250ms ease, border-color 250ms ease;
+    }
+
+    body.light .bar {
+      background: rgba(20, 26, 58, 0.08);
+    }
+
+    .bar>div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(122, 231, 255, 0.95), rgba(177, 140, 255, 0.95), rgba(124, 255, 178, 0.95));
+      transition: width 0.35s ease;
+    }
+
+    body.light .bar>div {
+      background: linear-gradient(90deg, rgba(60, 180, 255, 0.95), rgba(160, 120, 255, 0.95), rgba(10, 166, 109, 0.95));
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: var(--toastBg);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 60px rgba(0, 0, 0, 0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease, background 250ms ease, border-color 250ms ease;
+      z-index: 80;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-weight: 950;
+      letter-spacing: 0.2px;
+      user-select: none;
+      max-width: min(640px, 92vw);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .toast .ok {
+      color: var(--good);
+      font-weight: 1000;
+    }
+
+    .loveOverlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px;
+      background: var(--loveOverlayBg);
+      z-index: 120;
+      backdrop-filter: blur(6px);
+      transition: background 250ms ease;
+    }
+
+    .loveOverlay .loveCard {
+      border-radius: 26px;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--glass), var(--glass2));
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+      padding: 26px 18px;
+      max-width: 520px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loveOverlay h2 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: 0.4px;
+      line-height: 1.12;
+      color: var(--text);
+    }
+
+    .loveOverlay p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+
+    .loveGlow {
+      pointer-events: none;
+      position: absolute;
+      inset: -40px;
+      background:
+        radial-gradient(300px 220px at 30% 20%, rgba(122, 231, 255, 0.25), transparent 70%),
+        radial-gradient(300px 220px at 70% 30%, rgba(177, 140, 255, 0.25), transparent 70%),
+        radial-gradient(300px 220px at 50% 80%, rgba(124, 255, 178, 0.16), transparent 70%);
+      filter: blur(6px);
+      transition: opacity 250ms ease;
+    }
+
+    body.light .loveGlow {
+      opacity: 0.75;
+    }
+
+    .modalBg {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: var(--modalBg);
+      z-index: 110;
+      backdrop-filter: blur(6px);
+      transition: background 250ms ease;
+    }
+
+    .modal {
+      max-width: 620px;
+      width: 100%;
+      border-radius: 26px;
+      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--glass), var(--glass2));
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+      overflow: hidden;
+      color: var(--text);
+    }
+
+    .modalHead {
+      padding: 16px 16px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    body.light .modalHead {
+      border-bottom: 1px solid rgba(20, 26, 58, 0.10);
+    }
+
+    .modalHead h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.25px;
+      color: var(--text);
+    }
+
+    .modalBody {
+      padding: 14px 16px 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    .modalPromise {
+      margin: 10px 0 8px;
+      font-size: 20px;
+      font-weight: 1000;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .modalActions {
+      padding: 0 16px 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body class="dark">
+  <div class="noise"></div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="title">
+        <h1>Soline I Promise…</h1>
+        <p class="subtitle">Swap tiles to restore the sentence. Each solved puzzle unlocks a promise. Tap two tiles on
+          mobile, or drag and drop on desktop.</p>
+      </div>
+
+      <div class="topPills">
+        <div class="pill"><span class="k" id="levelPill">Level 1</span><span class="v" id="namePill">Mont Blanc</span>
+        </div>
+        <div class="pill"><span class="k" id="movesPill">0</span><span class="v">Moves</span></div>
+        <div class="pill" id="scenePill" style="cursor:pointer;">
+          <span class="k" id="sceneK">Scene</span><span class="v" id="sceneV">Night</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="card">
+        <div class="cardHeader">
+          <div class="miniTitle">
+            <div class="label">Puzzle</div>
+            <div class="big" id="sentenceHint">Arrange the words to match the promise</div>
+          </div>
+          <div class="actions">
+            <button class="btn" id="shuffleBtn">Shuffle</button>
+            <button class="btn" id="hintBtn">Hint</button>
+            <button class="btn" id="resetBtn">Reset</button>
+            <button class="btn primary" id="sceneBtn" aria-label="Toggle scene">Toggle Scene</button>
+            <button class="btn good" id="nextBtn" disabled>Next</button>
+          </div>
+        </div>
+
+        <div class="boardWrap">
+          <div class="board" id="board" aria-label="Promise puzzle board"></div>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="card">
+          <div class="sideBlock">
+            <div class="miniTitle">
+              <div class="label">Unlocked promise</div>
+              <div class="big">Your promises appear here</div>
+            </div>
+            <p class="promiseText" id="unlockedText">Solve the first puzzle to unlock your first promise.</p>
+            <p class="muted" id="sideNote">After each solve, you get a love pop and then your promise.</p>
+
+            <div class="progressRow">
+              <div style="min-width:110px;">Progress</div>
+              <div class="bar">
+                <div id="barFill"></div>
+              </div>
+              <div id="progressText" style="min-width:82px;text-align:right;">0 of 6</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="sideBlock">
+            <div class="miniTitle">
+              <div class="label">Scene</div>
+              <div class="big">Day and night vibe</div>
+            </div>
+            <p class="muted">Toggle Scene changes the whole atmosphere. The selection is remembered on this device.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><span class="ok">✓</span><span id="toastMsg">Done</span></div>
+
+  <div class="loveOverlay" id="loveOverlay" aria-hidden="true">
+    <div class="loveCard">
+      <div class="loveGlow"></div>
+      <h2>Soline I love you</h2>
+      <p>One more promise unlocked</p>
+    </div>
+  </div>
+
+  <div class="modalBg" id="modalBg" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modalHead">
+        <h3 id="modalTitle">Promise unlocked</h3>
+      </div>
+      <div class="modalBody">
+        <div class="modalPromise" id="modalPromise"></div>
+        <div id="modalBodyText">Continue when you are ready.</div>
+      </div>
+      <div class="modalActions">
+        <button class="btn" id="copyBtn">Copy</button>
+        <button class="btn good" id="closeBtn">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const LEVELS = [
+      { name: "Mont Blanc", sentence: "I promise to take you to Mt Blanc." },
+      { name: "Window seats", sentence: "I promise to save window seats for us on every journey." },
+      { name: "Uncertain chapters", sentence: "I promise to hold your hand through every uncertain chapter." },
+      { name: "Mountains home", sentence: "I promise to build a home with you on the mountains." },
+      { name: "Explore", sentence: "I promise to keep exploring the world with you." },
+      { name: "Every day", sentence: "I promise to choose you every day." }
+    ];
+
+    const boardEl = document.getElementById("board");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const hintBtn = document.getElementById("hintBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    const levelPill = document.getElementById("levelPill");
+    const namePill = document.getElementById("namePill");
+    const movesPill = document.getElementById("movesPill");
+
+    const unlockedText = document.getElementById("unlockedText");
+    const barFill = document.getElementById("barFill");
+    const progressText = document.getElementById("progressText");
+
+    const toast = document.getElementById("toast");
+    const toastMsg = document.getElementById("toastMsg");
+
+    const loveOverlay = document.getElementById("loveOverlay");
+    const modalBg = document.getElementById("modalBg");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalPromise = document.getElementById("modalPromise");
+    const modalBodyText = document.getElementById("modalBodyText");
+    const closeBtn = document.getElementById("closeBtn");
+    const copyBtn = document.getElementById("copyBtn");
+
+    const sceneBtn = document.getElementById("sceneBtn");
+    const scenePill = document.getElementById("scenePill");
+    const sceneV = document.getElementById("sceneV");
+
+    let levelIndex = 0;
+    let tiles = [];
+    let solution = [];
+    let moves = 0;
+    let selectedIndex = null;
+    let solved = false;
+
+    const KEY = "soline_promise_puzzle_scene_v1";
+
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 1200);
+    }
+
+    function tokenize(sentence) {
+      const raw = sentence.trim().split(/\s+/);
+      const t = raw.slice(0);
+      while (t.length < 16) t.push("");
+      if (t.length > 16) {
+        const kept = t.slice(0, 15);
+        const rest = t.slice(15).join(" ");
+        kept.push(rest);
+        return kept;
+      }
+      return t;
+    }
+
+    function loadState() {
+      try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveState(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+
+    function unlockedCount() {
+      const st = loadState();
+      const u = st.unlocked || {};
+      return Object.keys(u).length;
+    }
+    function setUnlocked(i) {
+      const st = loadState();
+      st.unlocked = st.unlocked || {};
+      st.unlocked[String(i)] = true;
+      st.lastUnlocked = LEVELS[i].sentence;
+      saveState(st);
+    }
+    function lastUnlocked() {
+      const st = loadState();
+      return st.lastUnlocked || "";
+    }
+
+    function setUI() {
+      levelPill.textContent = `Level ${levelIndex + 1}`;
+      namePill.textContent = LEVELS[levelIndex].name;
+      movesPill.textContent = String(moves);
+
+      const c = unlockedCount();
+      barFill.style.width = `${(c / LEVELS.length) * 100}%`;
+      progressText.textContent = `${c} of ${LEVELS.length}`;
+
+      const last = lastUnlocked();
+      if (last) unlockedText.textContent = last;
+
+      sceneV.textContent = document.body.classList.contains("light") ? "Day" : "Night";
+    }
+
+    function buildLevel() {
+      const lvl = LEVELS[levelIndex];
+      solution = tokenize(lvl.sentence);
+      tiles = solution.map(x => x);
+      moves = 0;
+      solved = false;
+      selectedIndex = null;
+      nextBtn.disabled = true;
+
+      shuffleTiles(true);
+      render();
+      setUI();
+    }
+
+    function render() {
+      boardEl.innerHTML = "";
+      tiles.forEach((word, idx) => {
+        const d = document.createElement("div");
+        d.className = "tile" + (word === "" ? " empty" : "");
+        d.draggable = true;
+        d.dataset.index = String(idx);
+        d.innerHTML = `<div>${escapeHtml(word === "" ? "⋯" : word)}<small>${idx + 1}</small></div>`;
+
+        d.addEventListener("click", () => {
+          if (solved) return;
+          if (selectedIndex === null) {
+            selectedIndex = idx;
+            d.classList.add("selected");
+            showToast("Select another tile");
+          } else {
+            const a = selectedIndex;
+            selectedIndex = null;
+            clearMarkers();
+            if (a !== idx) swap(a, idx);
+          }
+        });
+
+        d.addEventListener("dragstart", (e) => {
+          if (solved) return;
+          d.classList.add("dragging");
+          e.dataTransfer.setData("text/plain", String(idx));
+        });
+
+        d.addEventListener("dragend", () => {
+          d.classList.remove("dragging");
+          clearMarkers();
+        });
+
+        d.addEventListener("dragover", (e) => { e.preventDefault(); });
+
+        d.addEventListener("drop", (e) => {
+          e.preventDefault();
+          if (solved) return;
+          const from = Number(e.dataTransfer.getData("text/plain"));
+          const to = idx;
+          if (Number.isFinite(from) && from !== to) {
+            swap(from, to);
+          }
+        });
+
+        boardEl.appendChild(d);
+      });
+
+      movesPill.textContent = String(moves);
+    }
+
+    function clearMarkers() {
+      [...document.querySelectorAll(".tile")].forEach(el => {
+        el.classList.remove("selected");
+        el.classList.remove("hint");
+      });
+    }
+
+    function swap(a, b) {
+      const tmp = tiles[a];
+      tiles[a] = tiles[b];
+      tiles[b] = tmp;
+      moves += 1;
+      render();
+      checkSolved();
+    }
+
+    function checkSolved() {
+      const ok = tiles.every((t, i) => t === solution[i]);
+      if (ok) {
+        solved = true;
+        nextBtn.disabled = false;
+        setUnlocked(levelIndex);
+        setUI();
+        showLoveThenModal();
+      }
+    }
+
+    function shuffleTiles(avoidSolved) {
+      for (let i = tiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+      }
+      if (avoidSolved) {
+        const ok = tiles.every((t, i) => t === solution[i]);
+        if (ok) shuffleTiles(false);
+      }
+    }
+
+    function hint() {
+      if (solved) return;
+      clearMarkers();
+
+      let firstWrong = -1;
+      for (let i = 0; i < tiles.length; i++) {
+        if (tiles[i] !== solution[i]) {
+          firstWrong = i;
+          break;
+        }
+      }
+      if (firstWrong === -1) {
+        showToast("Almost there");
+        return;
+      }
+
+      const needed = solution[firstWrong];
+      let whereIsNeeded = -1;
+      for (let i = 0; i < tiles.length; i++) {
+        if (tiles[i] === needed && tiles[i] !== solution[i]) {
+          whereIsNeeded = i;
+          break;
+        }
+      }
+
+      const all = [...document.querySelectorAll(".tile")];
+      if (all[firstWrong]) all[firstWrong].classList.add("hint");
+      if (whereIsNeeded >= 0 && all[whereIsNeeded]) all[whereIsNeeded].classList.add("hint");
+      showToast("Hint highlighted");
+    }
+
+    function showLoveThenModal() {
+      loveOverlay.style.display = "flex";
+      loveOverlay.setAttribute("aria-hidden", "false");
+
+      setTimeout(() => {
+        loveOverlay.style.display = "none";
+        loveOverlay.setAttribute("aria-hidden", "true");
+        openModal();
+      }, 1100);
+    }
+
+    function openModal() {
+      const last = (levelIndex === LEVELS.length - 1);
+      modalTitle.textContent = last ? "Final promise" : "Promise unlocked";
+      modalPromise.textContent = LEVELS[levelIndex].sentence;
+      modalBodyText.textContent = last ? "That was the last level. You can replay any level and keep the promises here." : "Continue to the next promise when you want.";
+      modalBg.style.display = "flex";
+      modalBg.setAttribute("aria-hidden", "false");
+    }
+
+    function closeModal() {
+      modalBg.style.display = "none";
+      modalBg.setAttribute("aria-hidden", "true");
+    }
+
+    function escapeHtml(s) {
+      return s.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    }
+
+    function applyScene(scene) {
+      if (scene === "light") {
+        document.body.classList.remove("dark");
+        document.body.classList.add("light");
+      } else {
+        document.body.classList.remove("light");
+        document.body.classList.add("dark");
+      }
+      const st = loadState();
+      st.scene = document.body.classList.contains("light") ? "light" : "dark";
+      saveState(st);
+      setUI();
+    }
+
+    function toggleScene() {
+      const isLight = document.body.classList.contains("light");
+      applyScene(isLight ? "dark" : "light");
+      showToast(isLight ? "Night scene" : "Day scene");
+    }
+
+    shuffleBtn.addEventListener("click", () => {
+      if (solved) return;
+      shuffleTiles(true);
+      moves = 0;
+      render();
+      showToast("Shuffled");
+    });
+
+    resetBtn.addEventListener("click", () => {
+      buildLevel();
+      showToast("Reset");
+    });
+
+    hintBtn.addEventListener("click", hint);
+
+    nextBtn.addEventListener("click", () => {
+      if (!solved) return;
+      if (levelIndex < LEVELS.length - 1) {
+        levelIndex += 1;
+        buildLevel();
+        showToast("Next");
+      } else {
+        showToast("All promises unlocked");
+      }
+    });
+
+    closeBtn.addEventListener("click", closeModal);
+    modalBg.addEventListener("click", (e) => { if (e.target === modalBg) closeModal(); });
+
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(LEVELS[levelIndex].sentence);
+        showToast("Copied");
+      } catch {
+        showToast("Copy blocked");
+      }
+    });
+
+    sceneBtn.addEventListener("click", toggleScene);
+    scenePill.addEventListener("click", toggleScene);
+
+    const st0 = loadState();
+    if (st0.scene === "light") applyScene("light");
+    else applyScene("dark");
+
+    const last = lastUnlocked();
+    if (last) unlockedText.textContent = last;
+
+    setUI();
+    buildLevel();
+  </script>
+</body>
+
+</html>
