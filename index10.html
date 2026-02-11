@@ -1,0 +1,1008 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teddy Message in a Balloon</title>
+  <style>
+    :root {
+      --bg1: #070915;
+      --bg2: #1a1440;
+      --card: #ffffff12;
+      --card2: #ffffff1f;
+      --text: #f6f2ff;
+      --muted: #cbbfe9;
+      --glow: #ffffff40;
+      --shadow: 0 20px 60px rgba(0, 0, 0, .45);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      overflow: hidden;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #3a2a8a55 0%, transparent 60%),
+        radial-gradient(900px 700px at 80% 20%, #d56aa855 0%, transparent 55%),
+        radial-gradient(900px 700px at 50% 90%, #2fd1c255 0%, transparent 55%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+    }
+
+    .stars,
+    .stars2 {
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat;
+      opacity: .35;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .stars {
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #fff, transparent 60%),
+        radial-gradient(1px 1px at 80px 120px, #fff, transparent 60%),
+        radial-gradient(1.5px 1.5px at 140px 90px, #fff, transparent 60%),
+        radial-gradient(1px 1px at 200px 50px, #fff, transparent 60%),
+        radial-gradient(2px 2px at 260px 160px, #fff, transparent 60%),
+        radial-gradient(1px 1px at 320px 30px, #fff, transparent 60%),
+        radial-gradient(1.5px 1.5px at 380px 140px, #fff, transparent 60%),
+        radial-gradient(1px 1px at 420px 70px, #fff, transparent 60%);
+      background-size: 520px 220px;
+      animation: drift 30s linear infinite;
+    }
+
+    .stars2 {
+      opacity: .18;
+      background-image:
+        radial-gradient(2px 2px at 30px 40px, #fff, transparent 60%),
+        radial-gradient(1px 1px at 110px 160px, #fff, transparent 60%),
+        radial-gradient(1.5px 1.5px at 210px 120px, #fff, transparent 60%),
+        radial-gradient(1px 1px at 310px 70px, #fff, transparent 60%),
+        radial-gradient(2px 2px at 420px 190px, #fff, transparent 60%);
+      background-size: 560px 240px;
+      animation: drift2 46s linear infinite;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate3d(0, 0, 0);
+      }
+
+      to {
+        transform: translate3d(-80px, 50px, 0);
+      }
+    }
+
+    @keyframes drift2 {
+      from {
+        transform: translate3d(0, 0, 0);
+      }
+
+      to {
+        transform: translate3d(100px, -60px, 0);
+      }
+    }
+
+    .ui {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .panel {
+      pointer-events: auto;
+      background: linear-gradient(180deg, var(--card2), var(--card));
+      border: 1px solid #ffffff22;
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .title {
+      font-size: 16px;
+      letter-spacing: .2px;
+      margin: 0 0 6px 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.25rem;
+    }
+
+    .counter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid #ffffff22;
+      background: #00000018;
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      pointer-events: auto;
+      margin-top: 10px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid #ffffff2a;
+      background: linear-gradient(180deg, #ffffff1f, #ffffff10);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 650;
+      cursor: pointer;
+      transition: transform .12s ease, background .2s ease, border-color .2s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .25);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      border-color: #ffffff40;
+    }
+
+    button:active {
+      transform: translateY(0px) scale(.99);
+    }
+
+    button.secondary {
+      background: #00000018;
+      font-weight: 600;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 74px;
+      height: 92px;
+      cursor: pointer;
+      transform-origin: 50% 90%;
+      filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .35));
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .balloon:focus {
+      outline: none;
+    }
+
+    .float {
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      from {
+        transform: translate3d(0, 0, 0) rotate(-2deg);
+      }
+
+      50% {
+        transform: translate3d(10px, -18px, 0) rotate(2deg);
+      }
+
+      to {
+        transform: translate3d(0, 0, 0) rotate(-2deg);
+      }
+    }
+
+    .balloon .string {
+      position: absolute;
+      left: 50%;
+      top: 82px;
+      width: 2px;
+      height: 64px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #ffffff66, #ffffff10);
+      border-radius: 999px;
+      opacity: .7;
+    }
+
+    .balloon .knot {
+      position: absolute;
+      left: 50%;
+      top: 78px;
+      width: 10px;
+      height: 10px;
+      transform: translateX(-50%) rotate(45deg);
+      background: #ffffff55;
+      border-radius: 2px;
+      opacity: .75;
+      filter: blur(.2px);
+    }
+
+    .balloon svg {
+      position: absolute;
+      inset: 0;
+    }
+
+    .balloon .icon {
+      position: absolute;
+      left: 50%;
+      top: 34px;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .35));
+      pointer-events: none;
+    }
+
+    .pop {
+      animation: pop .28s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      60% {
+        transform: scale(1.18);
+        opacity: .9;
+      }
+
+      100% {
+        transform: scale(.2);
+        opacity: 0;
+      }
+    }
+
+    .burst {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: .9;
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .35));
+      animation: burst 700ms ease-out forwards;
+    }
+
+    @keyframes burst {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: .9;
+      }
+
+      100% {
+        transform: translate3d(var(--dx), var(--dy), 0) scale(.2);
+        opacity: 0;
+      }
+    }
+
+    .floor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 220px;
+      background: radial-gradient(900px 240px at 50% 100%, #00000055 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .teddyWrap {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: min(520px, 96vw);
+      height: 260px;
+      z-index: 3;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .teddy {
+      width: min(360px, 90vw);
+      transform-origin: 50% 90%;
+      filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .45));
+      animation: teddyIdle 3.8s ease-in-out infinite;
+    }
+
+    @keyframes teddyIdle {
+      0% {
+        transform: translateY(0) rotate(-.8deg);
+      }
+
+      50% {
+        transform: translateY(-6px) rotate(.8deg);
+      }
+
+      100% {
+        transform: translateY(0) rotate(-.8deg);
+      }
+    }
+
+    .teddy.bounce {
+      animation: teddyBounce 520ms ease-out 1;
+    }
+
+    @keyframes teddyBounce {
+      0% {
+        transform: translateY(0) scale(1);
+      }
+
+      40% {
+        transform: translateY(-14px) scale(1.01);
+      }
+
+      100% {
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .hint {
+      position: absolute;
+      left: 50%;
+      bottom: 234px;
+      transform: translateX(-50%);
+      z-index: 4;
+      background: #00000022;
+      border: 1px solid #ffffff22;
+      border-radius: 999px;
+      padding: 10px 12px;
+      backdrop-filter: blur(10px);
+      color: var(--muted);
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      pointer-events: none;
+      opacity: .95;
+    }
+
+    .modal {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 10;
+      background: rgba(0, 0, 0, .35);
+      backdrop-filter: blur(6px);
+    }
+
+    .modal.show {
+      display: grid;
+    }
+
+    .card {
+      width: min(720px, 92vw);
+      background: linear-gradient(180deg, #ffffff20, #ffffff10);
+      border: 1px solid #ffffff28;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px 18px 14px 18px;
+    }
+
+    .cardHeader {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .cardTitle {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+
+    .cardMeta {
+      margin: 4px 0 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .cardBody {
+      margin-top: 12px;
+      padding: 14px 14px;
+      border-radius: 16px;
+      border: 1px solid #ffffff1f;
+      background: #00000018;
+      line-height: 1.55rem;
+      font-size: 15px;
+      color: #f7f3ff;
+    }
+
+    .cardFooter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .small {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: 74px;
+      transform: translateX(-50%);
+      background: #00000025;
+      border: 1px solid #ffffff22;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      z-index: 8;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="stars"></div>
+  <div class="stars2"></div>
+
+  <div class="ui">
+    <div class="panel" style="max-width: 520px;">
+      <p class="title">Teddy Message in a Balloon</p>
+      <p class="subtitle">Pop a balloon to open a tiny letter. Each balloon is one warm hug in text form.</p>
+      <div class="btns">
+        <button id="inflateBtn">Inflate balloons</button>
+        <button id="resetBtn" class="secondary">Reset</button>
+        <button id="soundBtn" class="secondary">Sound: on</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="counter">
+        <div class="pill">Popped <b id="poppedCount">0</b> of <b id="totalCount">0</b></div>
+        <div class="pill">Remaining <b id="remainingCount">0</b></div>
+      </div>
+      <p class="subtitle" style="margin-top:10px;">
+        Tip: click anywhere once to unlock audio if your browser blocks it.
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Balloons inflated ✨</div>
+
+  <div class="stage" id="stage" aria-label="Balloon stage"></div>
+  <div class="floor"></div>
+
+  <div class="hint" id="hint">Click a balloon to pop it</div>
+
+  <div class="teddyWrap">
+    <!-- Simple teddy SVG -->
+    <svg class="teddy" id="teddy" viewBox="0 0 420 300" role="img" aria-label="Teddy bear holding balloons">
+      <defs>
+        <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f2d6b4" />
+          <stop offset="1" stop-color="#d8b089" />
+        </linearGradient>
+        <linearGradient id="fur2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#f9e4c7" />
+          <stop offset="1" stop-color="#cfa47b" />
+        </linearGradient>
+        <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur" />
+          <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 0 0
+                    0 0 0 .35 0" result="shadow" />
+          <feMerge>
+            <feMergeNode in="shadow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- arms -->
+      <g filter="url(#soft)">
+        <ellipse cx="105" cy="184" rx="62" ry="48" fill="url(#fur2)" />
+        <ellipse cx="315" cy="184" rx="62" ry="48" fill="url(#fur2)" />
+        <circle cx="70" cy="184" r="20" fill="#f8e1c9" opacity=".9" />
+        <circle cx="350" cy="184" r="20" fill="#f8e1c9" opacity=".9" />
+      </g>
+
+      <!-- body -->
+      <g filter="url(#soft)">
+        <ellipse cx="210" cy="210" rx="120" ry="90" fill="url(#fur)" />
+        <ellipse cx="210" cy="230" rx="75" ry="58" fill="#f7e2cc" opacity=".95" />
+      </g>
+
+      <!-- head -->
+      <g filter="url(#soft)">
+        <ellipse cx="210" cy="120" rx="100" ry="86" fill="url(#fur)" />
+        <ellipse cx="210" cy="145" rx="62" ry="52" fill="#f7e2cc" opacity=".95" />
+        <!-- ears -->
+        <ellipse cx="140" cy="66" rx="42" ry="36" fill="url(#fur2)" />
+        <ellipse cx="280" cy="66" rx="42" ry="36" fill="url(#fur2)" />
+        <ellipse cx="140" cy="74" rx="26" ry="22" fill="#f7e2cc" opacity=".9" />
+        <ellipse cx="280" cy="74" rx="26" ry="22" fill="#f7e2cc" opacity=".9" />
+      </g>
+
+      <!-- face -->
+      <g>
+        <circle cx="175" cy="120" r="10" fill="#1b1024" />
+        <circle cx="245" cy="120" r="10" fill="#1b1024" />
+        <circle cx="172" cy="116" r="3" fill="#ffffffaa" />
+        <circle cx="242" cy="116" r="3" fill="#ffffffaa" />
+
+        <path d="M210 132c-12 0-20 9-20 18 0 10 10 18 20 18s20-8 20-18c0-9-8-18-20-18z" fill="#f2c7b0" opacity=".85" />
+        <circle cx="210" cy="145" r="8" fill="#1b1024" />
+        <path d="M210 153c-10 0-20 7-28 16" stroke="#1b1024" stroke-width="3" fill="none" stroke-linecap="round" />
+        <path d="M210 153c10 0 20 7 28 16" stroke="#1b1024" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <circle cx="160" cy="145" r="10" fill="#ff7aa955" />
+        <circle cx="260" cy="145" r="10" fill="#ff7aa955" />
+      </g>
+
+      <!-- little heart patch -->
+      <g opacity=".95">
+        <path d="M210 220c-10-16-36-10-36 10 0 20 20 30 36 44 16-14 36-24 36-44 0-20-26-26-36-10z" fill="#ff6ea8" />
+        <path d="M210 220c-6-10-22-6-22 7 0 12 12 18 22 26 10-8 22-14 22-26 0-13-16-17-22-7z" fill="#ff98c2"
+          opacity=".9" />
+      </g>
+
+      <!-- paws holding strings -->
+      <g>
+        <circle cx="120" cy="196" r="16" fill="#f7e2cc" opacity=".95" />
+        <circle cx="300" cy="196" r="16" fill="#f7e2cc" opacity=".95" />
+        <path d="M124 190c10-10 18-14 28-16" stroke="#ffffff55" stroke-width="2" fill="none" stroke-linecap="round" />
+        <path d="M296 190c-10-10-18-14-28-16" stroke="#ffffff55" stroke-width="2" fill="none" stroke-linecap="round" />
+      </g>
+    </svg>
+  </div>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Message card">
+    <div class="card">
+      <div class="cardHeader">
+        <div>
+          <p class="cardTitle" id="cardTitle">A balloon popped</p>
+          <p class="cardMeta" id="cardMeta">A tiny letter from Teddy</p>
+        </div>
+        <button id="closeBtn" class="secondary" aria-label="Close message">Close</button>
+      </div>
+      <div class="cardBody" id="cardBody"></div>
+      <div class="cardFooter">
+        <div class="small" id="cardSmall">Pop another balloon for the next letter.</div>
+        <button id="nextBtn">Next balloon</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const stage = document.getElementById('stage');
+      const inflateBtn = document.getElementById('inflateBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const soundBtn = document.getElementById('soundBtn');
+      const toast = document.getElementById('toast');
+
+      const poppedCountEl = document.getElementById('poppedCount');
+      const totalCountEl = document.getElementById('totalCount');
+      const remainingCountEl = document.getElementById('remainingCount');
+
+      const modal = document.getElementById('modal');
+      const cardBody = document.getElementById('cardBody');
+      const closeBtn = document.getElementById('closeBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const teddy = document.getElementById('teddy');
+      const hint = document.getElementById('hint');
+
+      const recipientName = "Soline"; // change this if you want
+      const senderName = "Me";        // optional label inside the card meta
+
+      const icons = ["💗", "⭐", "🌙", "🍫", "☕", "🧸", "✨", "💌", "🌸", "🍓", "🫶", "🎀", "🕯️", "🍯", "🧡"];
+      const palette = [
+        { a: "#ff6ea8", b: "#ffb3d0" },
+        { a: "#7bf1ff", b: "#b7fbff" },
+        { a: "#a78bfa", b: "#d6c8ff" },
+        { a: "#ffd166", b: "#ffe6a6" },
+        { a: "#2fd1c2", b: "#a7fff2" },
+        { a: "#ff7a59", b: "#ffb7a6" },
+        { a: "#6ee7b7", b: "#bfffe6" },
+        { a: "#f472b6", b: "#ffd0e8" },
+      ];
+
+      const messages = [
+        `If I could, I would wrap my arms around you right now and stay there for a while. Not talking, not rushing, just breathing together. Until the world feels quiet again.`,
+
+        `Sometimes I look at the sky and wonder if you’re looking at the same one. It makes the distance feel smaller. Like we’re just two dots under the same blanket of stars.`,
+
+        `I wish you could see yourself the way I see you. Strong, gentle, ridiculously cute, and somehow my favorite human at the same time. You’re magic and you don’t even try.`,
+
+        `This balloon carries one soft hug. The kind where you melt into my chest and everything feels safe. Consider it officially delivered.`,
+
+        `Even on my busiest days, you’re always quietly there in my thoughts. Like background music that never stops playing. And honestly, it’s my favorite song.`,
+
+        `If I had a superpower, I wouldn’t choose flying or time travel. I’d choose teleporting, just to appear beside you whenever you say you miss me.`,
+
+        `You know what I miss the most? The tiny things. Your laugh, your random stories, the way you say my name. Those small details mean everything.`,
+
+        `I hope today was kind to you. And if it wasn’t, I hope this message feels like someone gently holding your face and saying it’s okay, I’ve got you.`,
+
+        `Some people search their whole lives for someone who feels like home. I somehow found you. And now every place without you feels slightly incomplete.`,
+
+        `I’m counting days until we meet again. Not because life is bad without you, but because life is simply better with you beside me.`,
+
+        `If cuddles could be shipped, you’d be drowning in packages by now. Express delivery, unlimited supply. No returns allowed.`,
+
+        `There’s something peaceful about loving you. No drama, no noise. Just warmth. Like sitting near a fireplace on a cold night.`,
+
+        `You make ordinary days special without even trying. A simple good morning from you can change my whole mood. That’s your power.`,
+
+        `Whenever you feel unsure or tired, remember this. There’s someone miles away who believes in you more than you believe in yourself. And that someone is me.`,
+
+        `I don’t just love you in big moments. I love you in the quiet ones too. The sleepy calls, the random texts, the silly jokes. That’s where it feels real.`,
+
+        `If I could bottle my feelings and send them to you, this balloon would glow. Because it’s full of soft, warm, golden love.`,
+
+        `Sometimes I imagine us years from now, laughing at how dramatic distance used to feel. And I smile because I know we’ll make it there together.`,
+
+        `Thank you for choosing me. Out of everyone in the world, you chose me. That still feels unreal and incredibly precious.`,
+
+        `I hope you know you’re never alone. Even when we’re apart, I’m quietly walking beside you. Just invisible.`,
+
+        `If today felt heavy, let me carry a piece of it. You don’t have to be strong all the time. Lean on me, even from far away.`,
+
+        `Your smile is my favorite place to live. If I could frame it and keep it forever, I absolutely would.`,
+
+        `Distance teaches patience, but it also teaches appreciation. Every moment with you feels rare and special. Like something worth protecting.`,
+
+        `This teddy is holding this balloon very carefully. Because inside it is one promise. I’m not going anywhere.`,
+
+        `One day we won’t need screens and messages like this. We’ll just reach across the couch and hold hands. I’m looking forward to that normal, simple happiness.`,
+
+        `Until I can hug you for real, let this little balloon hug stand in for me. Close your eyes for a second and imagine me there. Because in my head, I already am.`
+      ];
+
+      let audioOn = true;
+      let audioUnlocked = false;
+      let ctx = null;
+
+      let available = [];     // messages left to draw
+      let popped = 0;
+      let total = 0;
+      let balloons = [];
+      let lastFocusedIndex = 0;
+
+      function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function ensureAudio() {
+        if (audioUnlocked) return;
+        try {
+          ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+          audioUnlocked = true;
+        } catch (e) {
+          audioUnlocked = false;
+        }
+      }
+
+      function playTone({ freq = 440, type = "sine", duration = 0.12, gain = 0.05, slideTo = null } = {}) {
+        if (!audioOn) return;
+        ensureAudio();
+        if (!audioUnlocked || !ctx) return;
+        const t0 = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, t0);
+        if (slideTo) {
+          osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + duration);
+        }
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+        osc.connect(g).connect(ctx.destination);
+        osc.start(t0);
+        osc.stop(t0 + duration + 0.02);
+      }
+
+      function popSound() {
+        playTone({ freq: 760, type: "triangle", duration: 0.06, gain: 0.06, slideTo: 220 });
+        setTimeout(() => playTone({ freq: 520, type: "sine", duration: 0.08, gain: 0.04, slideTo: 780 }), 40);
+      }
+
+      function inflateSound() {
+        playTone({ freq: 220, type: "sine", duration: 0.08, gain: 0.03, slideTo: 330 });
+        setTimeout(() => playTone({ freq: 330, type: "sine", duration: 0.08, gain: 0.03, slideTo: 440 }), 90);
+        setTimeout(() => playTone({ freq: 440, type: "sine", duration: 0.10, gain: 0.03, slideTo: 660 }), 180);
+      }
+
+      function cardOpenSound() {
+        playTone({ freq: 392, type: "sine", duration: 0.10, gain: 0.035, slideTo: 523 });
+        setTimeout(() => playTone({ freq: 523, type: "sine", duration: 0.14, gain: 0.04, slideTo: 659 }), 110);
+      }
+
+      function showToast(text) {
+        toast.textContent = text;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 1200);
+      }
+
+      function setCounts() {
+        poppedCountEl.textContent = String(popped);
+        totalCountEl.textContent = String(total);
+        remainingCountEl.textContent = String(Math.max(0, total - popped));
+      }
+
+      function makeBalloonSVG(gradA, gradB) {
+        return `
+          <svg viewBox="0 0 74 92" aria-hidden="true">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="${gradB}" stop-opacity="0.98"/>
+                <stop offset="1" stop-color="${gradA}" stop-opacity="0.98"/>
+              </linearGradient>
+              <radialGradient id="h" cx="25%" cy="20%" r="70%">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <path d="M37 6c-16 0-28 13-28 30 0 19 12 34 28 46 16-12 28-27 28-46C65 19 53 6 37 6z" fill="url(#g)"/>
+            <path d="M37 10c-12 0-21 10-21 23 0 15 9 26 21 36 12-10 21-21 21-36 0-13-9-23-21-23z" fill="url(#h)"/>
+          </svg>
+        `;
+      }
+
+      function createBalloon(i, n) {
+        const b = document.createElement('div');
+        b.className = 'balloon float';
+        b.tabIndex = 0;
+
+        const p = palette[Math.floor(Math.random() * palette.length)];
+        const icon = icons[Math.floor(Math.random() * icons.length)];
+        const floatDur = 2.4 + Math.random() * 2.6;
+
+        b.style.animationDuration = `${floatDur}s`;
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const x = Math.random() * (vw - 90) + 20;
+        const y = Math.random() * (vh * 0.55) + 80;
+
+        b.style.left = `${x}px`;
+        b.style.top = `${y}px`;
+
+        b.innerHTML = `
+          ${makeBalloonSVG(p.a, p.b)}
+          <div class="icon">${icon}</div>
+          <div class="knot"></div>
+          <div class="string"></div>
+        `;
+
+        b.dataset.index = String(i);
+
+        b.addEventListener('click', () => onPop(b));
+        b.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            onPop(b);
+          }
+        });
+
+        return b;
+      }
+
+      function createBurst(x, y, base) {
+        const count = 12;
+        for (let k = 0; k < count; k++) {
+          const d = document.createElement('div');
+          d.className = 'burst';
+          const angle = (Math.PI * 2) * (k / count) + (Math.random() * 0.35);
+          const dist = 30 + Math.random() * 46;
+          const dx = Math.cos(angle) * dist;
+          const dy = Math.sin(angle) * dist;
+
+          d.style.left = `${x}px`;
+          d.style.top = `${y}px`;
+          d.style.background = base;
+          d.style.setProperty('--dx', `${dx}px`);
+          d.style.setProperty('--dy', `${dy}px`);
+          d.style.opacity = (0.7 + Math.random() * 0.3).toFixed(2);
+          d.style.width = `${6 + Math.random() * 10}px`;
+          d.style.height = d.style.width;
+
+          stage.appendChild(d);
+          setTimeout(() => d.remove(), 800);
+        }
+      }
+
+      function pickMessage() {
+        if (available.length === 0) {
+          available = shuffle(messages.slice());
+        }
+        return available.pop();
+      }
+
+      function onPop(balloon) {
+        if (balloon.classList.contains('pop')) return;
+        if (total === 0) return;
+
+        hint.style.opacity = '0';
+
+        const rect = balloon.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+
+        const base = (Math.random() < 0.5) ? "#ffd0e8" : "#b7fbff";
+
+        balloon.classList.add('pop');
+        popSound();
+
+        teddy.classList.remove('bounce');
+        void teddy.offsetWidth;
+        teddy.classList.add('bounce');
+
+        createBurst(cx, cy, base);
+
+        const msg = pickMessage();
+        popped += 1;
+        setCounts();
+
+        setTimeout(() => {
+          balloon.remove();
+          openCard(msg);
+          if (popped >= total) {
+            showToast("All balloons popped 💗  Press Reset to play again");
+          }
+        }, 220);
+      }
+
+      function openCard(message) {
+        cardBody.textContent = message;
+        document.getElementById('cardTitle').textContent = `To ${recipientName}`;
+        document.getElementById('cardMeta').textContent = `A tiny letter sent with love • from ${senderName}`;
+        document.getElementById('cardSmall').textContent = `Popped ${popped} of ${total}. Pop another balloon for the next letter.`;
+        modal.classList.add('show');
+        cardOpenSound();
+        closeBtn.focus();
+      }
+
+      function closeCard() {
+        modal.classList.remove('show');
+        const remaining = stage.querySelectorAll('.balloon');
+        if (remaining.length) {
+          const idx = Math.min(lastFocusedIndex, remaining.length - 1);
+          remaining[idx].focus();
+        }
+      }
+
+      function inflate() {
+        clearStage();
+        available = shuffle(messages.slice());
+        popped = 0;
+        total = messages.length;
+        setCounts();
+
+        const n = messages.length;
+        balloons = [];
+
+        for (let i = 0; i < n; i++) {
+          const el = createBalloon(i, n);
+          balloons.push(el);
+          stage.appendChild(el);
+        }
+
+        inflateSound();
+        showToast("Balloons inflated ✨");
+        hint.style.opacity = '0.95';
+      }
+
+      function clearStage() {
+        stage.innerHTML = "";
+      }
+
+      function reset() {
+        modal.classList.remove('show');
+        available = [];
+        popped = 0;
+        total = 0;
+        setCounts();
+        clearStage();
+        hint.style.opacity = '0.95';
+        showToast("Reset done");
+      }
+
+      function toggleSound() {
+        audioOn = !audioOn;
+        soundBtn.textContent = audioOn ? "Sound: on" : "Sound: off";
+        if (audioOn) {
+          inflateSound();
+        }
+      }
+
+      inflateBtn.addEventListener('click', inflate);
+      resetBtn.addEventListener('click', reset);
+      soundBtn.addEventListener('click', toggleSound);
+
+      closeBtn.addEventListener('click', closeCard);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeCard(); });
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('show')) closeCard();
+      });
+
+      nextBtn.addEventListener('click', () => {
+        modal.classList.remove('show');
+        const remaining = stage.querySelectorAll('.balloon');
+        if (!remaining.length) return;
+        lastFocusedIndex = Math.floor(Math.random() * remaining.length);
+        remaining[lastFocusedIndex].focus();
+        popSound();
+      });
+
+      window.addEventListener('pointerdown', () => ensureAudio(), { once: true });
+
+      window.addEventListener('resize', () => {
+        // keep balloons within bounds after resize
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        stage.querySelectorAll('.balloon').forEach(b => {
+          const rect = b.getBoundingClientRect();
+          let x = rect.left, y = rect.top;
+          x = Math.max(10, Math.min(x, vw - 90));
+          y = Math.max(60, Math.min(y, vh - 220));
+          b.style.left = `${x}px`;
+          b.style.top = `${y}px`;
+        });
+      });
+
+      // Initial state
+      reset();
+    })();
+  </script>
+</body>
+
+</html>
